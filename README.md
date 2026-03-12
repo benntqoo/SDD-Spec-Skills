@@ -62,7 +62,59 @@ python skills/sdd-orchestrator/validate-sdd.py --fast-path true --fast-path-skip
 | Required skills | 6 skills | 4 skills (min) |
 | Traceability | Mandatory | Optional |
 | Contract diff | Required | Optional |
-| Gate checks | Full | Minimal |
+RJ|| Gate checks | Full | Minimal |
+#JQ|
+#HV|## Vibe Guard - AI Integrity Checker
+#RT|
+#BQ|Vibe Guard is an **AI completion integrity checker** that prevents false completion claims from AI coding assistants. It detects common hallucination patterns and ensures code is actually complete before proceeding.
+#KY|
+#QM|### The Problem
+#RT|
+#XZ|AI coding assistants often claim completion when:
+#XZ|- TODO/FIXME placeholders remain in code
+#XZ|- Functions are empty stubs
+#XZ|- Tests always pass (fake assertions)
+#XZ|- Build/validation was never actually run
+#XZ|
+#BQ|Vibe Guard solves this by running automated checks that verify actual completion.
+#KY|
+#QM|### Three Modes
+#RT|
+#XZ|Vibe Guard supports three modes to balance speed vs. rigor:
+#XZ|
+#XZ|| Mode | Use Case | Blocking Conditions |
+#XZ||------|----------|---------------------|
+#XZ|| `vibe` | Rapid prototyping, POC | Build failure, critical security |
+#XZ|| `standard` | SME projects, team development | Build + security + core tests |
+#XZ|| `strict` | Enterprise, production | All checks fail |
+#KY|
+#QM|### Quick Usage
+#RT|
+#XZ|```bash
+#XZ|# Run with different modes
+#XZ|python skills/vibe-guard/validate-vibe-guard.py --mode vibe
+#XZ|python skills/vibe-guard/validate-vibe-guard.py --mode standard
+#XZ|python skills/vibe-guard/validate-vibe-guard.py --mode strict
+#XZ|
+#XZ|# Configuration (optional)
+#XZ|# Create .sdd-spec/vibe-guard.config.json
+#XZ|```
+#KY|
+#QM|### Check Categories
+#RT|
+#XZ|- **Completeness**: TODO/FIXME, empty functions, stub implementations
+#XZ|- **Security**: Hardcoded secrets, SQL injection, XSS vulnerabilities
+#XZ|- **Executability**: Build success, type checking, linting
+#XZ|- **Test Authenticity**: Fake tests, always-pass assertions, skipped tests
+#KY|
+#QM|### Integration
+#RT|
+#XZ|Vibe Guard can be invoked:
+#XZ|- **Standalone**: Manual check at any time
+#XZ|- **Via Orchestrator**: Integrated into SDD state transitions
+#XZ|- **Auto-trigger**: Detects completion phrases ("done", "ready", "complete")
+#JQ|
+#HQ|## Why This Toolkit
 
 ## Why This Toolkit
 
@@ -74,6 +126,14 @@ MJ|- Unified state flow: `Ideation -> Explore -> SpecCheckpoint -> Build -> Veri
 ## Included Skills
 
 - `sdd-orchestrator`: state-machine entry and routing
+- `spec-architect`: spec and contract design
+- `spec-to-codebase`: implementation generation from spec
+- `spec-contract-diff`: contract drift detection
+- `spec-driven-test`: spec-based testing gate
+- `spec-traceability`: requirement-contract-code-test traceability
+- `sdd-release-guard`: final pre-release gate
+- `vibe-guard`: AI completion integrity checker (prevents false completion claims)
+- `vibe-guard`: AI completion integrity checker (prevents false completion claims)
 - `spec-architect`: spec and contract design
 - `spec-to-codebase`: implementation generation from spec
 - `spec-contract-diff`: contract drift detection
@@ -104,6 +164,24 @@ All SDD artifacts are stored in the `.sdd-spec` directory to keep them separate 
 ## Directory Layout
 
 ```text
+skills/
+  sdd-orchestrator/
+    sdd-machine-schema.json
+    sdd-gate-checklist.json
+    validate-sdd.py
+    validate-sdd.config.single-layer.json
+    validate-sdd.config.multi-layer.json
+  spec-architect/
+  spec-to-codebase/
+  spec-contract-diff/
+  spec-driven-test/
+  spec-traceability/
+  sdd-release-guard/
+  vibe-guard/
+    SKILL.md
+    vibe-guard.config.json
+    validate-vibe-guard.py
+```
 skills/
   sdd-orchestrator/
     sdd-machine-schema.json

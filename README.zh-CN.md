@@ -62,7 +62,59 @@ python skills/sdd-orchestrator/validate-sdd.py --fast-path true --fast-path-skip
 | 必需技能 | 6 个 | 4 个（最低）|
 | 追踪矩阵 | 强制 | 可选 |
 | 契约差异 | 必需 | 可选 |
-| 关卡检查 | 完整 | 简化 |
+MR|| 关卡检查 | 完整 | 简化 |
+#JQ|
+#JJ|## Vibe Guard - AI 完整性校验器
+#RT|
+#BQ|Vibe Guard 是一个 **AI 完整性校验器**，用于防止 AI 编码助手虚假声称完成。它能检测常见的幻觉模式，确保代码真正完成后才能进入下一阶段。
+#KY|
+#QM|### 问题背景
+#RT|
+#XZ|AI 编码助手经常在以下情况声称完成：
+#XZ|- 代码中仍有 TODO/FIXME 占位符
+#XZ|- 函数是空的存根
+#XZ|- 测试永远通过（假断言）
+#XZ|- 构建/验证从未实际运行
+#XZ|
+#BQ|Vibe Guard 通过自动化检查解决这些问题。
+#KY|
+#QM|### 三种模式
+#RT|
+#XZ|Vibe Guard 支持三种模式，平衡速度与严格性：
+#XZ|
+#XZ|| 模式 | 适用场景 | 阻塞条件 |
+#XZ||------|----------|----------|
+#XZ|| `vibe` | 快速原型、POC | 构建失败、严重安全问题 |
+#XZ|| `standard` | 中小企业项目、团队开发 | 构建 + 安全 + 核心测试 |
+#XZ|| `strict` | 企业级、生产环境 | 所有检查失败 |
+#KY|
+#QM|### 快速使用
+#RT|
+#XZ|```bash
+#XZ|# 以不同模式运行
+#XZ|python skills/vibe-guard/validate-vibe-guard.py --mode vibe
+#XZ|python skills/vibe-guard/validate-vibe-guard.py --mode standard
+#XZ|python skills/vibe-guard/validate-vibe-guard.py --mode strict
+#XZ|
+#XZ|# 配置（可选）
+#XZ|# 创建 .sdd-spec/vibe-guard.config.json
+#XZ|```
+#KY|
+#QM|### 检查类别
+#RT|
+#XZ|- **完整性**：TODO/FIXME、空函数、存根实现
+#XZ|- **安全**：硬编码密钥、SQL 注入、XSS 漏洞
+#XZ|- **可执行性**：构建成功、类型检查、代码规范
+#XZ|- **测试真实性**：假测试、永远通过的断言、跳过的测试
+#KY|
+#QM|### 集成方式
+#RT|
+#XZ|Vibe Guard 可以通过以下方式调用：
+#XZ|- **独立运行**：随时手动检查
+#XZ|- **通过 Orchestrator**：集成到 SDD 状态转换
+#XZ|- **自动触发**：检测完成短语（"done"、"ready"、"complete"）
+#JQ|
+#JR|## 为什么使用这套工具
 
 ## 为什么使用这套工具
 
@@ -80,6 +132,14 @@ MB|- 统一状态流转：`Ideation -> Explore -> SpecCheckpoint -> Build -> Ver
 - `spec-driven-test`：基于规格的测试关卡
 - `spec-traceability`：需求-契约-代码-测试追踪
 - `sdd-release-guard`：发布前最终守门
+- `vibe-guard`：AI 完整性校验器（防止 AI 虚假完成）
+- `spec-architect`：规格与契约设计
+- `spec-to-codebase`：从规格生成实现
+- `spec-contract-diff`：契约漂移检测
+- `spec-driven-test`：基于规格的测试关卡
+- `spec-traceability`：需求-契约-代码-测试追踪
+- `sdd-release-guard`：发布前最终守门
+- `vibe-guard`：AI 完整性校验器（防止 AI 虚假完成）
 
 ## 产物存储
 
@@ -104,6 +164,24 @@ MB|- 统一状态流转：`Ideation -> Explore -> SpecCheckpoint -> Build -> Ver
 ## 目录结构
 
 ```text
+skills/
+  sdd-orchestrator/
+    sdd-machine-schema.json
+    sdd-gate-checklist.json
+    validate-sdd.py
+    validate-sdd.config.single-layer.json
+    validate-sdd.config.multi-layer.json
+  spec-architect/
+  spec-to-codebase/
+  spec-contract-diff/
+  spec-driven-test/
+  spec-traceability/
+  sdd-release-guard/
+  vibe-guard/
+    SKILL.md
+    vibe-guard.config.json
+    validate-vibe-guard.py
+```
 skills/
   sdd-orchestrator/
     sdd-machine-schema.json

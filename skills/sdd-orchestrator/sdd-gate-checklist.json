@@ -125,6 +125,42 @@
         "observability_checks_present",
         "rollback_plan_present"
       ]
+    },
+    "vibe-guard": {
+      "type": "integrity_checker",
+      "description": "AI completion integrity checker - prevents false completion claims from AI coding assistants. Can run in parallel with any other skill or be invoked standalone.",
+      "entry_state": [
+        "Ideation",
+        "Explore",
+        "SpecCheckpoint",
+        "Build",
+        "Verify",
+        "ReleaseReady"
+      ],
+      "success_state": "<current_state>",
+      "failure_state": "<current_state>",
+      "required_outputs": [
+        ".sdd-spec/vibe-guard-report.json"
+      ],
+      "gate_checks": [
+        "no_blocking_completeness_issues",
+        "build_success",
+        "no_critical_security_issues"
+      ],
+      "modes": {
+        "vibe": {
+          "blocking_conditions": ["build_failure", "critical_security"],
+          "description": "Minimal checks for rapid prototyping"
+        },
+        "standard": {
+          "blocking_conditions": ["build_failure", "security", "test_failure"],
+          "description": "Balanced checks for SME projects"
+        },
+        "strict": {
+          "blocking_conditions": ["build_failure", "security", "test_failure", "todo", "fake_test", "low_coverage"],
+          "description": "Full checks for enterprise projects"
+        }
+      }
     }
   }
 }

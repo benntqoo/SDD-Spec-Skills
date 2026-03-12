@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vibe-guard-config",
+  "title": "Vibe Guard Configuration",
+  "description": "Configuration for AI completion integrity checker",
+  "type": "object",
+  "properties": {
+    "mode": {
+      "type": "string",
+      "enum": ["vibe", "standard", "strict"],
+      "default": "standard",
+      "description": "Operating mode: vibe (minimal), standard (balanced), strict (full)"
+    },
+    "auto_trigger": {
+      "type": "boolean",
+      "default": true,
+      "description": "Automatically trigger checks on completion phrases"
+    },
+    "trigger_phrases": {
+      "type": "array",
+      "items": {"type": "string"},
+      "default": ["done", "ready", "complete", "finished", "完成", "完成了", "完成啦"],
+      "description": "Phrases that trigger automatic checks"
+    },
+    "grace_period_minutes": {
+      "type": "integer",
+      "default": 10,
+      "minimum": 0,
+      "description": "Skip re-check if within this window"
+    },
+    "skip_if_no_changes": {
+      "type": "boolean",
+      "default": true,
+      "description": "Skip check if no files changed since last run"
+    },
+    "checks": {
+      "type": "object",
+      "properties": {
+        "completeness": {
+          "type": "object",
+          "properties": {
+            "scan_todo": {"type": "boolean", "default": true},
+            "scan_stub": {"type": "boolean", "default": true},
+            "scan_fake_data": {"type": "boolean", "default": true},
+            "scan_unused_imports": {"type": "boolean", "default": true},
+            "severity_by_mode": {
+              "type": "object",
+              "properties": {
+                "vibe": {"type": "string", "enum": ["warning", "error"], "default": "warning"},
+                "standard": {"type": "string", "enum": ["warning", "error"], "default": "warning"},
+                "strict": {"type": "string", "enum": ["warning", "error"], "default": "error"}
+              }
+            }
+          }
+        },
+        "test_authenticity": {
+          "type": "object",
+          "properties": {
+            "require_execution": {
+              "type": "object",
+              "properties": {
+                "vibe": {"type": "boolean", "default": false},
+                "standard": {"type": "boolean", "default": true},
+                "strict": {"type": "boolean", "default": true}
+              }
+            },
+            "detect_fake_tests": {"type": "boolean", "default": true},
+            "min_coverage": {
+              "type": "object",
+              "properties": {
+                "vibe": {"type": "integer", "default": 0},
+                "standard": {"type": "integer", "default": 60},
+                "strict": {"type": "integer", "default": 80}
+              }
+            }
+          }
+        },
+        "executability": {
+          "type": "object",
+          "properties": {
+            "build": {
+              "type": "string",
+              "enum": ["error", "skip"],
+              "default": "error"
+            },
+            "type_check": {
+              "type": "object",
+              "properties": {
+                "vibe": {"type": "string", "enum": ["error", "skip", "warning"], "default": "skip"},
+                "standard": {"type": "string", "enum": ["error", "skip", "warning"], "default": "error"},
+                "strict": {"type": "string", "enum": ["error", "skip", "warning"], "default": "error"}
+              }
+            },
+            "lint": {
+              "type": "object",
+              "properties": {
+                "vibe": {"type": "string", "enum": ["error", "skip", "warning"], "default": "skip"},
+                "standard": {"type": "string", "enum": ["error", "skip", "warning"], "default": "warning"},
+                "strict": {"type": "string", "enum": ["error", "skip", "warning"], "default": "error"}
+              }
+            }
+          }
+        },
+        "security": {
+          "type": "object",
+          "properties": {
+            "scan_secrets": {"type": "boolean", "default": true},
+            "scan_hardcoded": {"type": "boolean", "default": true},
+            "detect_sql_injection": {"type": "boolean", "default": true},
+            "detect_xss": {"type": "boolean", "default": true},
+            "detect_empty_catch": {"type": "boolean", "default": true},
+            "severity": {
+              "type": "string",
+              "enum": ["warning", "error"],
+              "default": "error"
+            }
+          }
+        }
+      }
+    },
+    "file_patterns": {
+      "type": "object",
+      "properties": {
+        "scan": {
+          "type": "array",
+          "items": {"type": "string"},
+          "default": ["**/*.ts", "**/*.js", "**/*.jsx", "**/*.tsx", "**/*.py", "**/*.java", "**/*.go"]
+        },
+        "exclude": {
+          "type": "array",
+          "items": {"type": "string"},
+          "default": ["node_modules/**", "dist/**", "build/**", ".git/**", "__pycache__/**", "*.min.js"]
+        }
+      }
+    }
+  }
+}
