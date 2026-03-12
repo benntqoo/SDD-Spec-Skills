@@ -1,8 +1,8 @@
-# SkillFlow SDD Toolkit
+# SDD-Spec Skills
 
 [中文说明](./README.zh-CN.md)
 
-SkillFlow SDD Toolkit is an open-source **strict Spec-Driven Development (SDD) skills bundle**.  
+SDD-Spec Skills is an open-source **strict Spec-Driven Development (SDD) skills bundle**.
 It combines state-machine orchestration and gate validation to turn feature delivery into a trackable, verifiable, and releasable workflow.
 
 ## LAP Version Tags

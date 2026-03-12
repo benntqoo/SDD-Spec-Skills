@@ -1,8 +1,8 @@
-# SkillFlow SDD Toolkit
+# SDD-Spec Skills
 
 [English README](./README.md)
 
-SkillFlow SDD Toolkit 是一套可开源复用的 **严格 Spec-Driven Development（SDD）技能工具集**。  
+SDD-Spec Skills 是一套可开源复用的 **严格 Spec-Driven Development（SDD）技能工具集**。
 它通过状态机编排与关卡校验，把特性交付过程从“经验驱动”升级为“可追踪、可验证、可发布”。
 
 ## LAP 版本标签
