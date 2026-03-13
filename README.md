@@ -255,6 +255,59 @@ python skills/vibe-guard/validate-vibe-guard.py --check  # AI completion check
 - **vibe-guard**: Verifies AI completion after implementation
 - **vibe-integrity**: Validates .vibe-integrity/ directory structure
 
+## Multi-Agent Collaboration
+
+Vibe Integrity is designed for both single-agent and multi-agent use, with specific mechanisms to support collaboration:
+
+### Current Collaboration Capabilities
+
+| Mechanism | Description | Use Case |
+|-----------|-------------|----------|
+| **Git Branching** | Separate branches for different agents/sessions | Multi-agent parallel development |
+| **Union Merge** | `.vibe-integrity/*.yaml merge=union` in `.gitattributes` | Prevents data loss on conflicts |
+| **Validation Script** | Detects duplicate IDs and inconsistencies | Early conflict detection |
+| **Grace Periods** | 10-minute deduplication window | Prevents redundant writes |
+| **Session Isolation** | Different git worktrees for different workflows | Avoiding workflow confusion |
+
+### File Locking & Concurrency
+
+**Current Implementation:**
+- ✅ Backup creation before modifications
+- ✅ Atomic batch operations
+- ✅ Post-update validation
+- ❌ No file-level locking (recommended for sequential use)
+- ❌ No distributed locking (for multi-instance deployments)
+
+**Recommendation:** For multi-agent scenarios, use separate branches and coordinate via Git workflow rather than simultaneous writes to the same files.
+
+### Conflict Resolution
+
+When multiple agents modify the same .vibe-integrity/ files:
+
+1. **Git will detect conflicts** during merge/pull request
+2. **Union merge** preserves both versions (may create duplicates)
+3. **Validation script** identifies duplicate IDs
+4. **Manual resolution** required to merge similar decisions
+
+### Best Practices for Multi-Agent Use
+
+1. **Use Separate Branches**: Each agent gets its own feature branch
+2. **Coordinate Architecture Decisions**: Document major decisions in shared records
+3. **Regular Validation**: Run validation script frequently
+4. **Pull Request Reviews**: Review .vibe-integrity/ changes before merging
+5. **Conflict Resolution**: Use validation script to detect and fix duplicates
+
+### Multi-Instance Considerations
+
+For deployments with multiple agent instances:
+
+- **File Locking**: Implement file-level locks in vibe-integrity-writer
+- **Distributed Locking**: Use Redis or similar for multi-server deployments
+- **Lease Mechanism**: Implement TTL for locks to prevent deadlocks
+- **Fallback Strategy**: Graceful degradation when locks unavailable
+
+See [MULTI_AGENT_COLLABORATION.md](skills-base/vibe-integrity/MULTI_AGENT_COLLABORATION.md) for detailed analysis.
+
 **Workflow Separation Guidance**: To avoid confusion when using multiple methodologies:
 - Use `vibe-design` during the clarification phase to understand requirements and record decisions
 - Use `vibe-guard` after implementation claims to verify completion

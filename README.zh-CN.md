@@ -252,6 +252,59 @@ python skills/vibe-guard/validate-vibe-guard.py --check  # AI 完成检查
 - **vibe-design**: 澄清需求，做出决策，调用 writer 更新 YAML
 - **vibe-integrity-debug**: 执行根因分析，识别风险，调用 writer 更新 YAML
 - **vibe-integrity-writer**: 安全更新 .vibe-integrity/ YAML 文件，具备备份和验证
+
+## 多智能体协作
+
+Vibe Integrity 支持单智能体和多智能体使用，具有特定的协作机制：
+
+### 当前协作能力
+
+| 机制 | 描述 | 用例 |
+|-----------|-------------|----------|
+| **Git 分支** | 不同智能体/会话使用独立分支 | 多智能体并行开发 |
+| **Union 合并** | `.gitattributes` 中的 `.vibe-integrity/*.yaml merge=union` | 避免数据丢失 |
+| **验证脚本** | 检测重复 ID 和不一致性 | 早期冲突检测 |
+| **宽限期** | 10 分钟去重窗口 | 防止冗余写入 |
+| **会话隔离** | 不同 git worktree 用于不同工作流 | 避免工作流混淆 |
+
+### 文件锁定与并发
+
+**当前实现：**
+- ✅ 修改前创建备份
+- ✅ 原子批量操作
+- ✅ 更新后验证
+- ❌ 无文件级锁定（建议顺序使用）
+- ❌ 无分布式锁定（用于多实例部署）
+
+**建议：** 对于多智能体场景，使用独立分支并通过 Git 工作流协调，而非同时写入相同文件。
+
+### 冲突解决
+
+当多个智能体修改相同的 .vibe-integrity/ 文件时：
+
+1. **Git 会在合并/PR 时检测冲突**
+2. **Union 合并**保留两个版本（可能产生重复）
+3. **验证脚本**识别重复 ID
+4. **手动解决**以合并相似决策
+
+### 多智能体最佳实践
+
+1. **使用独立分支**：每个智能体使用自己的功能分支
+2. **协调架构决策**：在共享记录中记录重要决策
+3. **定期验证**：频繁运行验证脚本
+4. **PR 审查**：合并前审查 .vibe-integrity/ 变更
+5. **冲突解决**：使用验证脚本检测和修复重复
+
+### 多实例考虑
+
+对于多服务器部署：
+
+- **文件锁定**：在 vibe-integrity-writer 中实现文件级锁
+- **分布式锁定**：多服务器使用 Redis 等工具
+- **租约机制**：实现 TTL 防止死锁
+- **降级策略**：锁不可用时优雅降级
+
+详见 [MULTI_AGENT_COLLABORATION.md](skills-base/vibe-integrity/MULTI_AGENT_COLLABORATION.md) 获取详细分析。
 - **vibe-guard**: 实现完成后验证 AI 完成情况
 - **vibe-integrity**: 验证 .vibe-integrity/ 目录结构
 
