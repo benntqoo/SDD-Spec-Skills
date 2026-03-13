@@ -1,5 +1,9 @@
 ---
 name: vibe-integrity-writer
+description: Specialized skill for safely updating .vibe-integrity/ YAML files with multi-agent collaboration support, file locking, and conflict detection
+implementation: skills-base/vibe-integrity-writer/vibe-integrity-writer.py
+---
+name: vibe-integrity-writer
 description: Specialized skill for safely updating .vibe-integrity/ YAML files, designed to be called by other skills like vibe-design and vibe-integrity-debug
 ---
 
@@ -232,3 +236,40 @@ This makes it suitable for:
 - Use in custom automation scripts
 - Integration with orchestrator systems
 - Testing in isolation
+
+## Implementation Details
+
+### File Locking
+The writer implements file-based locking to prevent concurrent writes:
+- Lock files are created in `.vibe-integrity/locks/`
+- Timeout: 30 seconds (configurable)
+- Stale lock detection and cleanup
+
+### Agent Tracking
+All updates include agent metadata:
+- `agent_id`: Unique identifier for the agent
+- `session_id`: Session identifier for tracking
+- `timestamp`: ISO format timestamp
+- `branch`: Current git branch
+
+### Conflict Detection
+The writer detects potential conflicts:
+- Duplicate record IDs
+- Simultaneous edits to same file
+- Provides conflict information in result
+
+### Command-Line Usage
+```bash
+# Add a new tech record
+python skills-base/vibe-integrity-writer/vibe-integrity-writer.py \
+  --target tech-records.yaml \
+  --operation add_record \
+  --data '{"id": "DB-001", "title": "Use PostgreSQL"}' \
+  --options '{"validate_after": true, "generate_index": true}'
+
+# Update existing record
+python skills-base/vibe-integrity-writer/vibe-integrity-writer.py \
+  --target tech-records.yaml \
+  --operation update_record \
+  --data '{"id": "DB-001", "status": "completed"}'
+```

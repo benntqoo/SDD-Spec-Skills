@@ -275,6 +275,17 @@ Vibe Integrity is designed for both single-agent and multi-agent use, with speci
 - ✅ Backup creation before modifications
 - ✅ Atomic batch operations
 - ✅ Post-update validation
+- ✅ **File-level locking** (implemented in vibe-integrity-writer)
+- ✅ **Agent identity tracking** (all updates include agent metadata)
+- ✅ **Conflict detection** (detects duplicate IDs and similar decisions)
+- ❌ No distributed locking (for multi-instance deployments)
+
+**Recommendation:** For multi-agent scenarios, use the new file locking and conflict detection features. Each agent should still use separate branches when possible, but the system now supports concurrent writes with proper locking.
+
+**Current Implementation:**
+- ✅ Backup creation before modifications
+- ✅ Atomic batch operations
+- ✅ Post-update validation
 - ❌ No file-level locking (recommended for sequential use)
 - ❌ No distributed locking (for multi-instance deployments)
 

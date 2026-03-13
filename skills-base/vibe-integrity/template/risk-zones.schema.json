@@ -12,6 +12,11 @@ required:
   - version
   - zones
   - generated_at
+  - metadata
+required:
+  - version
+  - zones
+  - generated_at
 
 properties:
   version:
@@ -70,3 +75,21 @@ properties:
   generated_at:
     type: "string"
     format: "date-time"
+
+  metadata:
+    type: "object"
+    required:
+      - agent_id
+      - session_id
+      - timestamp
+      - branch
+    properties:
+      agent_id:
+        type: "string"
+      session_id:
+        type: "string"
+      timestamp:
+        type: "string"
+        format: "date-time"
+      branch:
+        type: "string"

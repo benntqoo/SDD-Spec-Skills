@@ -1,5 +1,7 @@
 # Agent Collaboration Guide
 
+**Updated with Multi-Agent Collaboration Features**
+
 ## Current System Status
 
 ✅ **Multi-Agent Supported**: Yes, via Git branching workflow
@@ -60,3 +62,97 @@ When multiple agents modify the same YAML files:
 3. Custom Git merge driver for YAML files
 4. Agent coordination protocol
 5. Real-time collaboration interface
+
+
+## New Multi-Agent Collaboration Features
+
+### File Locking
+- ✅ Implemented in `vibe-integrity-writer`
+- Lock files created in `.vibe-integrity/locks/`
+- 30-second timeout with stale lock detection
+- Prevents concurrent writes to same file
+
+### Agent Identity Tracking
+- ✅ All YAML updates include agent metadata:
+  - `agent_id`: Unique agent identifier
+  - `session_id`: Session identifier
+  - `timestamp`: ISO format timestamp
+  - `branch`: Git branch name
+
+### Conflict Detection
+- ✅ `conflict-detector.py` script for:
+  - Duplicate ID detection
+  - Similar decision detection
+  - Concurrent modification detection
+  - Missing metadata detection
+
+### Agent Registry
+- ✅ `agent-registry.py` for:
+  - Agent registration and tracking
+  - Status management (active/idle/completed)
+  - Session tracking
+  - Stale agent cleanup
+
+## Updated Workflow
+
+### Using Multi-Agent Features
+
+1. **Register Agent** (optional):
+   ```bash
+   python skills-base/vibe-integrity-writer/agent-registry.py --register --name "My Agent"
+   ```
+
+2. **Check for Conflicts**:
+   ```bash
+   python skills-base/vibe-integrity-writer/conflict-detector.py
+   ```
+
+3. **Use vibe-integrity-writer** (with automatic agent tracking):
+   ```bash
+   python skills-base/vibe-integrity-writer/vibe-integrity-writer.py \
+     --target tech-records.yaml \
+     --operation add_record \
+     --data '{"id": "DB-001", "title": "Use PostgreSQL"}'
+   ```
+
+4. **Monitor Active Agents**:
+   ```bash
+   python skills-base/vibe-integrity-writer/agent-registry.py --list-active
+   ```
+
+## Best Practices for Multi-Agent Collaboration
+
+1. **Use Separate Branches**: Each agent should work on its own branch
+2. **Check for Conflicts**: Run conflict detector before and after changes
+3. **Review Agent Activity**: Monitor active agents to avoid conflicts
+4. **Clean Up Stale Agents**: Regularly run cleanup to mark inactive agents
+5. **Validate After Updates**: Always validate YAML structure after modifications
+
+## Example Multi-Agent Scenario
+
+```bash
+# Agent 1: Branch feature/auth
+# Agent 2: Branch feature/database
+
+# Both agents register
+python skills-base/vibe-integrity-writer/agent-registry.py --register --name "Auth Agent"
+python skills-base/vibe-integrity-writer/agent-registry.py --register --name "Database Agent"
+
+# Agent 1 adds authentication decision
+python skills-base/vibe-integrity-writer/vibe-integrity-writer.py \
+  --target tech-records.yaml \
+  --operation add_record \
+  --data '{"id": "AUTH-001", "title": "Use JWT for authentication"}'
+
+# Agent 2 adds database decision
+python skills-base/vibe-integrity-writer/vibe-integrity-writer.py \
+  --target tech-records.yaml \
+  --operation add_record \
+  --data '{"id": "DB-001", "title": "Use PostgreSQL for main database"}'
+
+# Check for conflicts
+python skills-base/vibe-integrity-writer/conflict-detector.py
+
+# List active agents
+python skills-base/vibe-integrity-writer/agent-registry.py --list-active
+```

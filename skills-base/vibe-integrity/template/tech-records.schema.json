@@ -10,6 +10,10 @@ type: "object"
 required:
   - version
   - records
+  - metadata
+required:
+  - version
+  - records
 
 properties:
   version:
@@ -69,4 +73,32 @@ properties:
           items:
             type: "string"
         notes:
+          type: "string"
+
+  metadata:
+    type: "object"
+    required:
+      - agent_id
+      - session_id
+      - timestamp
+      - branch
+    properties:
+      agent_id:
+        type: "string"
+      session_id:
+        type: "string"
+      timestamp:
+        type: "string"
+        format: "date-time"
+      branch:
+        type: "string"
+
+        agent_id:
+          type: "string"
+        session_id:
+          type: "string"
+        timestamp:
+          type: "string"
+          format: "date-time"
+        branch:
           type: "string"
