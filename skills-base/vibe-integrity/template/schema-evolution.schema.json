@@ -1,0 +1,82 @@
+# Schema Evolution - Vibe Integrity
+# =================================
+# Purpose: Track data model changes and their impact
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "vibe-integrity-schema-evolution"
+title: "Vibe Integrity Schema Evolution"
+
+type: "object"
+required:
+  - version
+  - tables
+
+properties:
+  version:
+    type: "string"
+
+  tables:
+    type: "array"
+    items:
+      type: "object"
+      required:
+        - name
+        - versions
+      properties:
+        name:
+          type: "string"
+        description:
+          type: "string"
+        status:
+          type: "string"
+          enum: ["in-use", "deprecated", "replaced"]
+        versions:
+          type: "array"
+          items:
+            type: "object"
+            required:
+              - version
+              - date
+              - fields
+            properties:
+              version:
+                type: "string"
+              date:
+                type: "string"
+                format: "date"
+              change_type:
+                type: "string"
+                enum: ["create", "modify", "migrate", "deprecate"]
+              fields:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    name:
+                      type: "string"
+                    type:
+                      type: "string"
+                    constraints:
+                      type: "array"
+                      items:
+                        type: "string"
+                    nullable:
+                      type: "boolean"
+                    default:
+                      type: "string"
+                    description:
+                      type: "string"
+              affected_code:
+                type: "array"
+                items:
+                  type: "string"
+              migration_script:
+                type: "string"
+              rollback_script:
+                type: "string"
+              reason:
+                type: "string"
+
+  generated_at:
+    type: "string"
+    format: "date-time"

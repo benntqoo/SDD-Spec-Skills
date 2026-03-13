@@ -1,0 +1,233 @@
+# Tech Records - Vibe Integrity
+# ===============================
+# Purpose: Track technical decisions and architecture evolution
+# Read this to understand WHY the system is designed this way
+
+version: "1.0"
+
+records:
+  # Database Decisions
+  # ------------------
+  - id: DB-001
+    date: "2026-01-15"
+    category: database
+    title: "选择 SQLite 作为 MVP 数据库"
+    context: |
+      项目处于 MVP 阶段，需要快速启动
+      团队规模小，无需高并发
+    decision: |
+      使用 SQLite 作为开发数据库
+      - 零配置，易于启动
+      - 文件存储，无需数据库服务
+      - 适合 MVP 快速迭代
+    alternatives_considered:
+      - "PostgreSQL: 需要额外服务，配置复杂"
+      - - MongoDB: 不适合关系型数据"
+    reason: "MVP 阶段优先速度，SQLite 足够"
+    impact: low
+    status: completed
+    from_version: null
+    to_version: "SQLite 3"
+    migration_needed: true
+    migration_path: "SQLite → PostgreSQL (beta 阶段)"
+    related_files:
+      - "prisma/schema.prisma"
+      - "docker-compose.yml"
+    notes: "计划在 beta 阶段迁移到 PostgreSQL"
+
+  - id: DB-002
+    date: "2026-02-20"
+    category: database
+    title: "添加 Prisma ORM"
+    context: |
+      纯 SQL 编写查询容易出错
+      需要类型安全的数据库访问
+    decision: |
+      使用 Prisma 作为 ORM 层
+      - 类型安全
+      - 自动迁移
+      - 良好的开发体验
+    alternatives_considered:
+      - "TypeORM: 文档不如 Prisma 完善"
+      - "Knex.js: 需要手写 SQL"
+    reason: "TypeScript 项目首选，与 Prisma 集成良好"
+    impact: low
+    status: completed
+    related_files:
+      - "prisma/schema.prisma"
+      - "src/prisma/index.ts"
+      - "package.json"
+
+  - id: DB-003
+    date: "2026-03-08"
+    category: database
+    title: "计划迁移到 PostgreSQL"
+    context: |
+      Beta 版本需要支持多用户并发
+      SQLite 文件锁限制并发写入
+    decision: |
+      迁移到 PostgreSQL
+      - 支持高并发
+      - 更好的事务支持
+      - 适合生产环境
+    impact: high
+    status: planned
+    from_version: "SQLite 3"
+    to_version: "PostgreSQL 15"
+    migration_needed: true
+    migration_path: |
+      1. 修改 prisma schema provider
+      2. 创建新迁移脚本
+      3. 导出 SQLite 数据
+      4. 导入 PostgreSQL
+      5. 更新 docker-compose.yml
+    related_files:
+      - "prisma/schema.prisma"
+      - "docker-compose.yml"
+      - "src/prisma/index.ts"
+    related_records:
+      - "DB-001"
+    notes: |
+      预计工作量: 2-3 小时
+      需要通知用户迁移期间服务不可用
+
+  # Authentication Decisions
+  # ------------------------
+  - id: AUTH-001
+    date: "2026-01-18"
+    category: authentication
+    title: "使用 JWT 进行身份验证"
+    context: |
+      需要无状态的认证机制
+      移动端和 Web 端都需要支持
+    decision: |
+      使用 JWT (JSON Web Token)
+      - 无状态，扩展性好
+      - 跨平台支持
+      - 标准协议
+    alternatives_considered:
+      - "Session: 需要服务端存储，不适合分布式"
+      - "OAuth2: 过度设计，MVP 不需要第三方登录"
+    reason: "简单有效，适合 REST API"
+    impact: medium
+    status: completed
+    from_version: null
+    to_version: "JWT (jsonwebtoken 9.0)"
+    related_files:
+      - "src/services/jwt.service.ts"
+      - "src/auth/verify-token.ts"
+    notes: |
+      当前 token 有效期: 1 小时
+      计划添加 refresh token 机制
+
+  - id: AUTH-002
+    date: "2026-03-10"
+    category: authentication
+    title: "添加 Refresh Token 机制"
+    context: |
+      当前 token 1 小时过期
+      用户需要频繁重新登录，体验差
+    decision: |
+      添加 refresh token
+      - Access token: 1 小时有效期
+      - Refresh token: 7 天有效期
+      - 定期刷新，保持登录状态
+    alternatives_considered:
+      - "延长 access token: 安全风险高"
+      - "Session: 需要服务端存储"
+    reason: "平衡安全性和用户体验"
+    impact: medium
+    status: completed
+    from_version: "JWT 单一 token"
+    to_version: "JWT + Refresh Token"
+    related_files:
+      - "src/auth/refresh-token.ts"
+      - "src/services/jwt.service.ts"
+    notes: |
+      Refresh token 存储在 httpOnly cookie
+      需要实现 token 轮换机制
+
+  # Architecture Decisions
+  # ----------------------
+  - id: ARCH-001
+    date: "2026-01-15"
+    category: architecture
+    title: "采用三层架构"
+    context: |
+      需要清晰的项目结构
+      便于团队协作和代码维护
+    decision: |
+      三层架构:
+      - Controller (路由): 处理 HTTP 请求
+      - Service (业务): 业务逻辑
+      - Repository (数据): 数据库操作
+    alternatives_considered:
+      - "Controller + Model: 业务逻辑分散"
+      - "Domain-Driven: 过度设计"
+    reason: "简单清晰，适合中小项目"
+    impact: low
+    status: completed
+    related_files:
+      - "src/routes/"
+      - "src/services/"
+      - "src/repositories/"
+    notes: "每层职责清晰，便于测试"
+
+  # Frontend Decisions
+  # ------------------
+  - id: FE-001
+    date: "2026-01-20"
+    category: frontend
+    title: "选择 Vue 3 + Composition API"
+    context: |
+      团队熟悉 Vue
+      需要响应式 UI
+    decision: |
+      使用 Vue 3 + Composition API
+      - 更好的 TypeScript 支持
+      - 逻辑复用更灵活
+      - 更好的性能
+    alternatives_considered:
+      - "Vue 2 + Options API: 正在维护模式"
+      - "React: 团队不熟悉"
+    reason: "团队熟悉，生态完善"
+    impact: low
+    status: completed
+    related_files:
+      - "src/views/"
+      - "src/components/"
+
+  - id: FE-002
+    date: "2026-02-10"
+    category: frontend
+    title: "使用 Pinia 进行状态管理"
+    context: |
+      多个组件需要共享状态
+      Auth 状态需要全局访问
+    decision: |
+      使用 Pinia
+      - Vue 3 官方推荐
+      - TypeScript 支持好
+      - API 简洁
+    alternatives_considered:
+      - "Vuex: 4.x 是最后版本，不再活跃"
+      - "Redux: 团队不熟悉"
+    reason: "Vue 3 生态，集成最佳"
+    impact: low
+    status: completed
+    related_files:
+      - "src/stores/"
+
+
+# Quick Reference
+# ===============
+# Database: DB-001 → DB-002 → DB-003 (planned)
+# Auth: AUTH-001 → AUTH-002
+# Architecture: ARCH-001
+# Frontend: FE-001 → FE-002
+
+# Future Considerations
+# =====================
+# - 添加 Redis 缓存 (性能优化)
+# - 消息队列 (异步处理)
+# - CDN 静态资源 (性能优化)

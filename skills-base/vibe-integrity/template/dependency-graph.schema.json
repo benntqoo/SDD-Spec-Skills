@@ -1,0 +1,92 @@
+# Dependency Graph - Vibe Integrity
+# =================================
+# Purpose: AI can quickly understand module dependencies
+# AI should read this to understand what modules depend on what
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "vibe-integrity-dependency-graph"
+title: "Vibe Integrity Dependency Graph"
+
+type: "object"
+required:
+  - version
+  - modules
+  - external_dependencies
+  - generated_at
+
+properties:
+  version:
+    type: "string"
+    description: "Schema version"
+
+  modules:
+    type: "object"
+    description: "Internal module dependencies"
+    additionalProperties:
+      type: "object"
+      required:
+        - type
+        - files
+      properties:
+        type:
+          type: "string"
+          enum: ["module", "service", "repository", "controller", "middleware", "component", "util"]
+        description:
+          type: "string"
+        files:
+          type: "array"
+          items:
+            type: "string"
+          description: "File paths belonging to this module"
+        depends_on:
+          type: "array"
+          items:
+            type: "string"
+          description: "Module names this module depends on"
+        used_by:
+          type: "array"
+          items:
+            type: "string"
+          description: "Modules that use this module"
+        exports:
+          type: "array"
+          items:
+            type: "string"
+          description: "Public APIs/exports"
+
+  external_dependencies:
+    type: "object"
+    description: "External packages and libraries"
+    additionalProperties:
+      type: "object"
+      properties:
+        version:
+          type: "string"
+        type:
+          type: "string"
+          enum: ["framework", "library", "tool", "database"]
+        used_in:
+          type: "array"
+          items:
+            type: "string"
+        reason:
+          type: "string"
+
+  database_dependencies:
+    type: "object"
+    description: "Database schema dependencies"
+    additionalProperties:
+      type: "object"
+      properties:
+        tables:
+          type: "array"
+          items:
+            type: "string"
+        accessed_by:
+          type: "array"
+          items:
+            type: "string"
+
+  generated_at:
+    type: "string"
+    format: "date-time"

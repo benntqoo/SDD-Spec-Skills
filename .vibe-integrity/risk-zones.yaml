@@ -1,0 +1,154 @@
+# Risk Zones - Vibe Integrity
+# ============================
+# Purpose: AI knows which areas are high-risk before making changes
+# Read this file BEFORE making any modifications
+
+version: "1.0"
+generated_at: "2026-03-12T10:30:00Z"
+
+# Risk Zones
+# ==========
+zones:
+  # CRITICAL: Authentication & Security
+  # -----------------------------------
+  auth-service:
+    risk_level: critical
+    reason: |
+      Handles user credentials and JWT tokens.
+      Any bug here = security vulnerability.
+    impact_description: |
+      - Users can't log in
+      - Security vulnerabilities (token leakage, auth bypass)
+      - All authenticated features break
+    stability: medium
+    last_modified: "2026-03-10"
+    related_migrations:
+      - "20260310-add-refresh-token"
+    test_coverage: partial
+    caution_notes:
+      - "Always test login/logout after changes"
+      - "Never log tokens or passwords"
+      - "Verify token expiry handling"
+
+  auth-middleware:
+    risk_level: critical
+    reason: |
+      Protects all authenticated routes.
+      Breaks = unauthorized access or lockout.
+    impact_description: |
+      - Public access to private routes
+      - Users locked out of system
+    stability: stable
+    last_modified: "2026-01-20"
+    test_coverage: full
+    caution_notes:
+      - "Test with valid and invalid tokens"
+      - "Check 401 vs 403 responses"
+
+  # HIGH: Data Layer
+  # ----------------
+  prisma-client:
+    risk_level: high
+    reason: |
+      Single point of database access.
+      Breaking changes affect all repositories.
+    impact_description: |
+      - All database operations fail
+      - Complete system outage
+    stability: stable
+    last_modified: "2026-01-15"
+    test_coverage: minimal
+    caution_notes:
+      - "Never change field types without migration"
+      - "Check cascade delete implications"
+
+  user-repository:
+    risk_level: high
+    reason: |
+      User data access layer.
+      Affects auth and user services.
+    impact_description: |
+      - Auth failures
+      - User data corruption
+    stability: stable
+    last_modified: "2026-02-28"
+    related_migrations:
+      - "20260228-add-user-settings"
+    test_coverage: partial
+
+  # MEDIUM: Business Logic
+  # ----------------------
+  order-service:
+    risk_level: medium
+    reason: |
+      Core business logic.
+      Bugs affect order processing.
+    impact_description: |
+      - Orders not created
+      - Incorrect calculations
+      - Inventory sync issues
+    stability: medium
+    last_modified: "2026-03-08"
+    related_migrations:
+      - "20260308-add-order-status"
+    test_coverage: partial
+    caution_notes:
+      - "Test order creation end-to-end"
+      - "Verify inventory deduction"
+
+  # LOW: UI Components
+  # -------------------
+  ui-components:
+    risk_level: low
+    reason: |
+      Visual components.
+      Breaking = UI issues, not system failures.
+    impact_description: |
+      - Broken UI display
+      - Bad user experience
+    stability: unstable
+    last_modified: "2026-03-12"
+    test_coverage: minimal
+    caution_notes:
+      - "Test responsive layouts"
+      - "Check accessibility"
+
+  # STABLE: Utilities
+  # -----------------
+  utils:
+    risk_level: low
+    reason: |
+      Pure utility functions.
+      Very stable, widely used.
+    impact_description: |
+      - Minor functionality breaks
+    stability: stable
+    last_modified: "2026-01-10"
+    test_coverage: full
+    caution_notes: []
+
+
+# Global Rules
+# ============
+global_rules:
+  high_risk_patterns:
+    - "Deleting migration files"
+    - "Changing field types in Prisma schema"
+    - "Modifying auth middleware"
+    - "Changing JWT secret or expiry"
+    - "Adding required fields to user table"
+
+  avoid_patterns: |
+    - Don't bypass authentication in production code
+    - Don't use console.log in error handlers
+    - Don't catch errors without logging
+    - Don't create circular dependencies
+
+
+# Risk Level Summary
+# ==================
+# critical: System down, security breach - MUST have tests, MUST review
+# high: Major functionality broken - MUST have tests, review recommended
+# medium: Some features affected - tests recommended
+# low: Minor issues - can proceed with caution
+# stable: Safe to modify - proceed normally

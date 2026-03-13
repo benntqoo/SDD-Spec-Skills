@@ -1,0 +1,72 @@
+# Tech Records - Vibe Integrity
+# ===============================
+# Purpose: Track technical decisions and architecture evolution
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "vibe-integrity-tech-records"
+title: "Vibe Integrity Tech Records"
+
+type: "object"
+required:
+  - version
+  - records
+
+properties:
+  version:
+    type: "string"
+
+  records:
+    type: "array"
+    items:
+      type: "object"
+      required:
+        - id
+        - date
+        - category
+        - title
+        - decision
+      properties:
+        id:
+          type: "string"
+        date:
+          type: "string"
+          format: "date"
+        category:
+          type: "string"
+          enum: ["database", "authentication", "architecture", "infrastructure", "frontend", "backend", "security", "performance", "other"]
+        title:
+          type: "string"
+        context:
+          type: "string"
+        decision:
+          type: "string"
+        alternatives_considered:
+          type: "array"
+          items:
+            type: "string"
+        reason:
+          type: "string"
+        impact:
+          type: "string"
+          enum: ["low", "medium", "high", "breaking"]
+        status:
+          type: "string"
+          enum: ["planned", "in-progress", "completed", "deprecated", "reverted"]
+        from_version:
+          type: "string"
+        to_version:
+          type: "string"
+        migration_needed:
+          type: "boolean"
+        migration_path:
+          type: "string"
+        related_files:
+          type: "array"
+          items:
+            type: "string"
+        related_records:
+          type: "array"
+          items:
+            type: "string"
+        notes:
+          type: "string"

@@ -1,299 +1,243 @@
-# SDD-Spec Skills
+# Vibe Integrity
 
 [English README](./README.md)
 
-SDD-Spec Skills 是一套可开源复用的 **严格 Spec-Driven Development（SDD）技能工具集**。
-它通过状态机编排与关卡校验，把特性交付过程从“经验驱动”升级为“可追踪、可验证、可发布”。
+Vibe Integrity 是一个专门为 AI 辅助开发（vibe coding）设计的 **AI 项目记忆与安全系统**。它能防止 AI 编码助手虚假声称完成，并提供结构化的项目知识以实现 AI 的快速理解。
 
-## LAP 版本标签
+## 概述
 
-- `lap-v1-strict-sdd`：v1 基线，默认对大多数任务采用重关卡严格流程
-- `lap-v2-adaptive-sdd`：v2 自适应，按风险分级启用关卡并保留探索轻流程
+Vibe Integrity 解决了 AI 辅助开发中的两个关键问题：
 
-## LAP v2 差异化设计
+1. **完成守卫** - 检测 AI 是否虚假声称工作已完成（TODO/FIXME 占位符、空函数、假测试等）
+2. **架构记忆** - 提供结构化的项目知识，使 AI 能快速理解项目状态而无需阅读数百个文件
 
-LAP v2 保留 v1 的可追踪与发布安全能力，同时削减阻碍快速迭代的过重仪式。
+与传统开发方法不同，Vibe Integrity 是 **方法论无关** 的 - 它适用于 TDD、SDD、敏捷或纯 vibe 编程方法。
 
-- 任务粒度升级：从 2-5 分钟原子切分，升级为保留架构上下文的有边界纵向切片
-- Spec 同步升级：从全程人工同步，升级为检查点同步（`SpecCheckpoint`）并输出差异摘要
-- Worktree 策略升级：改为风险分级触发，仅在高风险跨模块或并行开发场景强制使用
-- 关卡策略升级：拆分为 `Explore`、`Build`、`Release` 三种模式并配置不同必选校验
+## 核心概念
 
-### v2 状态流
+### 两大支柱
 
-`Ideation -> Explore -> SpecCheckpoint -> Build -> Verify -> ReleaseReady -> Released`
+#### 支柱 1：完成守卫
+检测和验证以确保 AI 实际完成了工作。
 
-### v2 状态-技能映射
+| 技能 | 目的 |
+|------|------|
+| `vibe-guard` | 检测 TODO、空函数、假测试 |
+| `cascade-check` | 防止修复后的级联错误 |
+| `integration-check` | 验证组件集成 |
 
-| 状态 | 主要技能 | 用途 |
-|------|----------|------|
-| `Ideation` | `spec-architect` | 将模糊需求转换为可执行规格 |
-| `Explore` | `spec-architect`, `spec-traceability` | 架构探索，Spec 快照可选 |
-| `SpecCheckpoint` | `spec-architect` | Spec 验证与差异摘要同步 |
-| `Build` | `spec-to-codebase`, `spec-contract-diff`, `spec-traceability` | 代码生成与聚焦验证 |
-| `Verify` | `spec-driven-test`, `spec-traceability` | 契约验证与测试覆盖 |
-| `ReleaseReady` | `sdd-release-guard` | 最终发布关卡与回滚就绪 |
-| `Released` | - | 功能已交付 |
+#### 支柱 2：架构记忆
+用于 AI 快速理解的结构化项目知识库。
 
-`Ideation -> Explore -> SpecCheckpoint -> Build -> Verify -> ReleaseReady -> Released`
+| 文件 | 目的 |
+|------|------|
+| `project.yaml` | 项目元信息，技术栈 |
+| `dependency-graph.yaml` | 模块依赖关系 |
+| `module-map.yaml` | 目录结构 |
+| `risk-zones.yaml` | 高风险区域 |
+| `tech-records.yaml` | 技术决策记录 |
+| `schema-evolution.yaml` | 数据模型演进 |
 
-### v2 模式矩阵
+## AI 快速开始
 
-- Explore 模式：本地探索实验、架构草图，Spec 快照可选
-- Build 模式：功能实现与聚焦验证，要求进行检查点 Spec 同步
-- Release 模式：完整契约校验、追踪通过、发布守门通过
+当 AI 开始在这个项目上工作时，请按此顺序阅读：
 
-### 快速路径模式
+```
+1. .vibe-integrity/project.yaml
+   → 了解项目状态和技术栈
 
-对于简单需求（配置变更、文档修复、Bug 修复），SDD-Spec Skills 支持**快速路径**模式，跳过非必要关卡：
+2. .vibe-integrity/risk-zones.yaml  
+   → 了解哪些区域是高风险的
+
+3. .vibe-integrity/dependency-graph.yaml
+   → 了解模块关系
+
+4. .vibe-integrity/module-map.yaml
+   → 查找文件位置
+
+5. .vibe-integrity/tech-records.yaml
+   → 理解系统为何如此设计
+```
+
+**结果**：AI 能在大约 15 秒内理解项目，而不是 3 分钟。
+
+## 使用方法
+
+### AI：在进行更改之前
 
 ```bash
-# 使用快速路径配置模板
-python skills/sdd-orchestrator/validate-sdd.py --config skills/sdd-orchestrator/validate-sdd.config.fast-path.json
+# 1. 检查风险区
+cat .vibe-integrity/risk-zones.yaml
 
-# 或通过命令行
-python skills/sdd-orchestrator/validate-sdd.py --fast-path true --fast-path-skips spec-traceability spec-contract-diff
+# 2. 检查依赖
+cat .vibe-integrity/dependency-graph.yaml
+
+# 3. 检查模式
+cat .vibe-integrity/schema-evolution.yaml
 ```
 
-**快速路径特性：**
+### AI：在"完成"之后
 
-| 特性 | 标准模式 | 快速路径 |
-|------|----------|----------|
-| 必需技能 | 6 个 | 4 个（最低）|
-| 追踪矩阵 | 强制 | 可选 |
-| 契约差异 | 必需 | 可选 |
-MR|| 关卡检查 | 完整 | 简化 |
-#JQ|
-#JJ|## Vibe Guard - AI 完整性校验器
-#RT|
-#BQ|Vibe Guard 是一个 **AI 完整性校验器**，用于防止 AI 编码助手虚假声称完成。它能检测常见的幻觉模式，确保代码真正完成后才能进入下一阶段。
-#KY|
-#QM|### 问题背景
-#RT|
-#XZ|AI 编码助手经常在以下情况声称完成：
-#XZ|- 代码中仍有 TODO/FIXME 占位符
-#XZ|- 函数是空的存根
-#XZ|- 测试永远通过（假断言）
-#XZ|- 构建/验证从未实际运行
-#XZ|
-#BQ|Vibe Guard 通过自动化检查解决这些问题。
-#KY|
-#QM|### 三种模式
-#RT|
-#XZ|Vibe Guard 支持三种模式，平衡速度与严格性：
-#XZ|
-#XZ|| 模式 | 适用场景 | 阻塞条件 |
-#XZ||------|----------|----------|
-#XZ|| `vibe` | 快速原型、POC | 构建失败、严重安全问题 |
-#XZ|| `standard` | 中小企业项目、团队开发 | 构建 + 安全 + 核心测试 |
-#XZ|| `strict` | 企业级、生产环境 | 所有检查失败 |
-#KY|
-#QM|### 快速使用
-#RT|
-#XZ|```bash
-#XZ|# 以不同模式运行
-#XZ|python skills/vibe-guard/validate-vibe-guard.py --mode vibe
-#XZ|python skills/vibe-guard/validate-vibe-guard.py --mode standard
-#XZ|python skills/vibe-guard/validate-vibe-guard.py --mode strict
-#XZ|
-#XZ|# 配置（可选）
-#XZ|# 创建 .sdd-spec/vibe-guard.config.json
-#XZ|```
-#KY|
-#QM|### 检查类别
-#RT|
-#XZ|- **完整性**：TODO/FIXME、空函数、存根实现
-#XZ|- **安全**：硬编码密钥、SQL 注入、XSS 漏洞
-#XZ|- **可执行性**：构建成功、类型检查、代码规范
-#XZ|- **测试真实性**：假测试、永远通过的断言、跳过的测试
-#KY|
-#QM|### 集成方式
-#RT|
-#XZ|Vibe Guard 可以通过以下方式调用：
-#XZ|- **独立运行**：随时手动检查
-#XZ|- **通过 Orchestrator**：集成到 SDD 状态转换
-#XZ|- **自动触发**：检测完成短语（"done"、"ready"、"complete"）
-#JQ|
-#JR|## 为什么使用这套工具
-
-## 为什么使用这套工具
-
-MB|- 统一状态流转：`Ideation -> Explore -> SpecCheckpoint -> Build -> Verify -> ReleaseReady -> Released`
-- 统一产物约束：规格、契约、测试、追踪矩阵、发布守门报告
-- 统一机器校验：`validate-sdd.py` 自动检查技能一致性与关卡完整性
-- 兼容多工具目录：支持单层与多层 `skills` 结构
-
-## 技能清单
-
-- `sdd-orchestrator`：状态机入口与路由控制
-- `spec-architect`：规格与契约设计
-- `spec-to-codebase`：从规格生成实现
-- `spec-contract-diff`：契约漂移检测
-- `spec-driven-test`：基于规格的测试关卡
-- `spec-traceability`：需求-契约-代码-测试追踪
-- `sdd-release-guard`：发布前最终守门
-- `vibe-guard`：AI 完整性校验器（防止 AI 虚假完成）
-- `spec-architect`：规格与契约设计
-- `spec-to-codebase`：从规格生成实现
-- `spec-contract-diff`：契约漂移检测
-- `spec-driven-test`：基于规格的测试关卡
-- `spec-traceability`：需求-契约-代码-测试追踪
-- `sdd-release-guard`：发布前最终守门
-- `vibe-guard`：AI 完整性校验器（防止 AI 虚假完成）
-
-## 产物存储
-
-所有 SDD 产物统一存储在 `.sdd-spec` 目录下，与项目代码分离：
-
-```text
-.sdd-spec/
-  specs/              # 规格、契约、追踪文件
-    <feature>.md
-    <feature>.contract.json
-    <feature>.traceability.yaml
-    <feature>.state.json
-    ...
-  tests/specs/       # 测试文件
-    <feature>.contract.spec.*
-    <feature>.acceptance.spec.*
-    ...
+```bash
+# 运行 vibe-guard
+python skills/vibe-guard/validate-vibe-guard.py --check
 ```
 
-> **注意**：`.sdd-spec` 目录已通过 `.gitignore` 自动忽略版本控制。
+### 人类：在进行重大更改之后
+
+```bash
+# 更新技术记录
+python skills/vibe-integrity/validate-vibe-integrity.py  # 首先检查完整性
+
+# 向 .vibe-integrity/tech-records.yaml 添加新决策
+# 向 .vibe-integrity/schema-evolution.yaml 添加新版本  
+# 在 .vibe-integrity/dependency-graph.yaml 中反映新的模块关系
+```
 
 ## 目录结构
 
-```text
-skills/
-  sdd-orchestrator/
-    sdd-machine-schema.json
-    sdd-gate-checklist.json
-    validate-sdd.py
-    validate-sdd.config.single-layer.json
-    validate-sdd.config.multi-layer.json
-  spec-architect/
-  spec-to-codebase/
-  spec-contract-diff/
-  spec-driven-test/
-  spec-traceability/
-  sdd-release-guard/
-  vibe-guard/
-    SKILL.md
-    vibe-guard.config.json
-    validate-vibe-guard.py
 ```
+.vibe-integrity/
+├── project.yaml              # 项目元信息
+├── dependency-graph.yaml     # 模块依赖关系
+├── module-map.yaml          # 目录结构
+├── risk-zones.yaml          # 高风险区域
+├── tech-records.yaml        # 技术决策记录
+└── schema-evolution.yaml   # 数据模型演进
+
 skills/
-  sdd-orchestrator/
-    sdd-machine-schema.json
-    sdd-gate-checklist.json
-    validate-sdd.py
-    validate-sdd.config.single-layer.json
-    validate-sdd.config.multi-layer.json
-  spec-architect/
-  spec-to-codebase/
-  spec-contract-diff/
-  spec-driven-test/
-  spec-traceability/
-  sdd-release-guard/
+├── vibe-guard/             # 完成检测
+└── vibe-integrity/         # 此技能
+    ├── SKILL.md
+    ├── validate-vibe-integrity.py
+    ├── validate-all.py
+    └── template/           # Schema 模板
+        ├── project.schema.json
+        ├── dependency-graph.schema.json
+        ├── module-map.schema.json
+        ├── risk-zones.schema.json
+        ├── tech-records.schema.json
+        └── schema-evolution.schema.json
 ```
+
+## 验证
+
+运行验证以确保完整性：
+
+```bash
+python skills/vibe-integrity/validate-vibe-integrity.py  # 检查 .vibe-integrity/ 文件
+python skills/vibe-integrity/validate-all.py             # 运行 vibe-guard 和 vibe-integrity 双重验证
+python skills/vibe-guard/validate-vibe-guard.py --check  # AI 完成检查
+```
+
+## 相关技能
+
+- `vibe-guard` - 完成检测
+- `superpowers/test-driven-development` - TDD 工作流（可选）
+- `sdd-orchestrator` - SDD 工作流（可选）
+
+**注意**：Vibe Integrity 适用于 ANY 开发方法。您可以单独使用 Vibe Integrity，或者将其与 SDD、TDD、敏捷或任何其他方法结合使用。上述列出的 SDD 和 TDD 技能是可选的附加功能，供希望在仍然受益于 Vibe Integrity 的完成守卫和项目记忆的同时遵循这些特定方法的团队使用。
 
 ## 快速开始
 
-1) 默认校验（扫描 `<root>/skills`）：
+1) 运行默认验证（扫描 `<root>/skills`）：
 
 ```bash
-python skills/sdd-orchestrator/validate-sdd.py
+python skills/vibe-integrity/validate-all.py
 ```
 
-2) 使用单层目录模板：
+2) 在您的项目中初始化 Vibe Integrity：
 
 ```bash
-python skills/sdd-orchestrator/validate-sdd.py --config skills/sdd-orchestrator/validate-sdd.config.single-layer.json
+# 创建带模板文件的 .vibe-integrity 目录
+python skills/vibe-integrity/validate-vibe-integrity.py --init
+
+# 或手动复制模板文件：
+cp -r skills/vibe-integrity/template/* .vibe-integrity/
 ```
 
-3) 使用多层目录模板：
-
-```bash
-python skills/sdd-orchestrator/validate-sdd.py --config skills/sdd-orchestrator/validate-sdd.config.multi-layer.json
-```
-
-4) 使用初始化工具创建新项目：
-
-```bash
-# 创建新项目结构
-python skills/sdd-orchestrator/bootstrap-sdd.py init ./my-project
-
-# 添加新功能
-python skills/sdd-orchestrator/bootstrap-sdd.py add my-feature ./my-project
-
-# 添加 skills 目录
-python skills/sdd-orchestrator/bootstrap-sdd.py add-skills ./my-project
-```
-
+3) 为您的项目自定义文件：
+   - 编辑 `.vibe-integrity/project.yaml` 以填写您的项目详情
+   - 更新 `.vibe-integrity/tech-records.yaml` 以包含您的技术决策
+   - 自定义 `.vibe-integrity/risk-zones.yaml` 以适用于您项目的风险区域
 
 ## 示例输出
 
+一次成功的验证运行看起来像这样：
+
 ```text
-SDD validation passed
-Root: D:\Code\aaa
-Skills paths:
-- D:\Code\aaa\skills
-Schema: D:\Code\aaa\skills\sdd-orchestrator\sdd-machine-schema.json
-Checklist: D:\Code\aaa\skills\sdd-orchestrator\sdd-gate-checklist.json
+Vibe Integrity 验证通过
+根目录: D:\Code\aaa
+已检查的文件:
+- .vibe-integrity/project.yaml ✓
+- .vibe-integrity/dependency-graph.yaml ✓
+- .vibe-integrity/module-map.yaml ✓
+- .vibe-integrity/risk-zones.yaml ✓
+- .vibe-integrity/tech-records.yaml ✓
+- .vibe-integrity/schema-evolution.yaml ✓
+
+Vibe Guard 验证:
+- TODO/FIXME 检查: 通过
+- 空函数检查: 通过
+- 假测试检查: 通过
+- 构建成功: 通过
+- 类型检查: 通过
+- 代码规范检查: 通过
+- 安全检查: 通过
+- 测试真实性: 通过
+
+所有验证均已通过
 ```
 
-出现 `SDD validation passed` 时，表示技能覆盖、状态枚举与关卡清单结构均已通过一致性检查。
+如果显示 `Vibe Integrity 验证通过`，则表示所有文件均存在且结构有效。
 
-## 配置方式
+## 配置
 
-`validate-sdd.py` 支持三类配置来源：命令参数、环境变量、JSON 配置文件。
+Vibe Integrity 使用 `.vibe-integrity/` 目录中的 YAML 文件进行配置。
 
-优先级：
+### project.yaml
+```yaml
+name: my-project
+version: 0.1.0
+status: mvp
+description: "我的惊人项目"
+created_at: 2026-01-15
+last_updated: 2026-03-12
+tech_stack:
+  前端: [Vue, Vite]
+  后端: [Express, Node]
+  数据库: [SQLite]
+```
 
-- `root_path`：命令参数 > 环境变量 > 配置文件 > 脚本默认
-- `skills_paths`：命令参数 + 环境变量 + 配置文件合并去重
+### tech-records.yaml
+```yaml
+records:
+  - id: DB-001
+    日期: "2026-01-15"
+    类别: database
+    标题: "选择 SQLite 作为 MVP"
+    决定: "使用 SQLite 实现快速迭代"
+    原因: "MVP 阶段优先考虑速度而非可扩展性"
+    影响: 低
+    状态: 已完成
+```
 
-常用参数：
+## 常见操作
 
-- `--root-path`
-- `--skills-path`（可重复传入）
-- `--orchestrator-path`
-- `--schema-path`
-- `--checklist-path`
-- `--recursive-search true|false`
-- `--config <json>`
+### 初始化新项目结构
+```bash
+python skills/vibe-integrity/validate-vibe-integrity.py --init
+```
 
-环境变量：
+### 验证完整性
+```bash
+python skills/vibe-integrity/validate-all.py
+```
 
-- `SDD_VALIDATE_CONFIG`
-- `SDD_ROOT_PATH`
-- `SDD_SKILLS_PATHS`
-- `SDD_ORCHESTRATOR_PATH`
-- `SDD_SCHEMA_PATH`
-- `SDD_CHECKLIST_PATH`
-- `SDD_RECURSIVE_SEARCH`
-
-## 常见失败与排查
-
-- `Unable to resolve sdd-orchestrator path from configured skills paths`
-  - 检查 `skills_paths` 是否指向真实技能根目录
-  - 检查 `sdd-orchestrator` 是否包含 `sdd-machine-schema.json` 与 `sdd-gate-checklist.json`
-- `SKILL.md not found for <skill>`
-  - 检查目标技能目录是否存在
-  - 多层目录结构请启用 `--recursive-search true`
-- `missing schema reference` 或 `missing checklist reference`
-  - 检查技能 `SKILL.md` 是否包含 schema 与 checklist 引用
-- `State enum mismatch between schema and checklist`
-  - 对齐 `sdd-machine-schema.json` 与 `sdd-gate-checklist.json` 的状态枚举
-- `Checklist section incomplete for <skill>`
-  - 检查 checklist 是否包含 `entry_state`、`required_outputs`、`gate_checks`
-
-## 开源发布建议
-
-- 技能目录统一放在项目根 `skills/`
-- 避免使用工具私有路径（例如 `.trae/skills/`）
-- 每次发布前执行校验脚本
-- `LICENSE` 与 `.gitignore` 与功能变更一起提交
+### AI 完成检查
+```bash
+python skills/vibe-guard/validate-vibe-guard.py --check
+```
 
 ## 许可证
 

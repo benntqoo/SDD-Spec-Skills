@@ -1,301 +1,243 @@
-# SDD-Spec Skills
+# Vibe Integrity
 
 [中文说明](./README.zh-CN.md)
 
-SDD-Spec Skills is an open-source **strict Spec-Driven Development (SDD) skills bundle**.
-It combines state-machine orchestration and gate validation to turn feature delivery into a trackable, verifiable, and releasable workflow.
+Vibe Integrity is an **AI Project Memory & Safety System** designed specifically for AI-assisted development (vibe coding). It prevents false completion claims from AI coding assistants and provides structured project knowledge for rapid AI understanding.
 
-## LAP Version Tags
+## Overview
 
-- `lap-v1-strict-sdd`: baseline strict SDD workflow with mandatory heavy gates for most tasks
-- `lap-v2-adaptive-sdd`: adaptive workflow with risk-based gates and lighter exploration path
+Vibe Integrity solves two critical problems in AI-assisted development:
 
-## LAP v2 Differential Design
+1. **Completion Guard** - Detects when AI falsely claims work is complete (TODO/FIXME placeholders, empty functions, fake tests, etc.)
+2. **Architecture Memory** - Provides structured project knowledge so AI can quickly understand project state without reading hundreds of files
 
-LAP v2 keeps traceability and release safety from v1, but removes excessive ceremony that blocks high-speed iteration.
+Unlike traditional development methodologies, Vibe Integrity is **methodology agnostic** - it works with TDD, SDD, Agile, or pure vibe coding approaches.
 
-- Context granularity upgrade: replace 2-5 minute atomic slicing with bounded vertical slices that preserve architecture context
-- Spec sync upgrade: move from manual always-on sync to checkpoint-based sync (`SpecCheckpoint`) with generated delta summary
-- Worktree policy upgrade: use risk-tier trigger, only mandatory for high-risk multi-module or parallel work
-- Gate policy upgrade: split into `Explore`, `Build`, and `Release` modes, each with different mandatory checks
+## Core Concepts
 
-### v2 State Flow
+### Two Pillars
 
-`Ideation -> Explore -> SpecCheckpoint -> Build -> Verify -> ReleaseReady -> Released`
+#### Pillar 1: Completion Guard
+Detection and validation to ensure AI actually completed the work.
 
-### v2 State-Skill Mapping
+| Skill | Purpose |
+|-------|---------|
+| `vibe-guard` | Detects TODO, empty functions, fake tests |
+| `cascade-check` | Prevents cascading errors after fixes |
+| `integration-check` | Validates component integration |
 
-| State | Primary Skills | Purpose |
-|-------|----------------|--------|
-| `Ideation` | `spec-architect` | Convert fuzzy requirements to executable specs |
-| `Explore` | `spec-architect`, `spec-traceability` | Architecture exploration, optional spec snapshot |
-| `SpecCheckpoint` | `spec-architect` | Spec validation and sync with delta summary |
-| `Build` | `spec-to-codebase`, `spec-contract-diff`, `spec-traceability` | Code generation and focused validation |
-| `Verify` | `spec-driven-test`, `spec-traceability` | Contract verification and test coverage |
-| `ReleaseReady` | `sdd-release-guard` | Final release gates and rollback readiness |
-| `Released` | - | Feature delivered |
+#### Pillar 2: Architecture Memory
+Structured project knowledge base for AI quick understanding.
 
-`Ideation -> Explore -> SpecCheckpoint -> Build -> Verify -> ReleaseReady -> Released`
+| File | Purpose |
+|------|---------|
+| `project.yaml` | Project metadata, tech stack |
+| `dependency-graph.yaml` | Module dependencies |
+| `module-map.yaml` | Directory structure |
+| `risk-zones.yaml` | High-risk areas |
+| `tech-records.yaml` | Technical decisions |
+| `schema-evolution.yaml` | Data model changes |
 
-### v2 Mode Matrix
+## AI Quick Start
 
-- Explore mode: local experiments, architecture notes, optional spec snapshot
-- Build mode: implementation and focused validation, checkpoint spec sync required
-- Release mode: full contract checks, traceability pass, release guard pass
+When AI starts work on this project, read in this order:
 
-### Fast Path Mode
+```
+1. .vibe-integrity/project.yaml
+   → Understand project status, tech stack
 
-For simple requirements (config changes, documentation, bug fixes), SDD-Spec Skills supports a **fast path** mode that skips non-essential gates:
+2. .vibe-integrity/risk-zones.yaml  
+   → Know what areas are high-risk
+
+3. .vibe-integrity/dependency-graph.yaml
+   → Understand module relationships
+
+4. .vibe-integrity/module-map.yaml
+   → Find where files are located
+
+5. .vibe-integrity/tech-records.yaml
+   → Understand why system is designed this way
+```
+
+**Result**: AI understands project in ~15 seconds instead of 3 minutes.
+
+## Usage
+
+### For AI: Before Making Changes
 
 ```bash
-# Use fast path config template
-python skills/sdd-orchestrator/validate-sdd.py --config skills/sdd-orchestrator/validate-sdd.config.fast-path.json
+# 1. Check risk zone
+cat .vibe-integrity/risk-zones.yaml
 
-# Or via CLI
-python skills/sdd-orchestrator/validate-sdd.py --fast-path true --fast-path-skips spec-traceability spec-contract-diff
+# 2. Check dependencies
+cat .vibe-integrity/dependency-graph.yaml
+
+# 3. Check schema
+cat .vibe-integrity/schema-evolution.yaml
 ```
 
-**Fast Path Characteristics:**
+### For AI: After "Completing"
 
-| Feature | Standard Mode | Fast Path |
-|---------|--------------|-----------|
-| Required skills | 6 skills | 4 skills (min) |
-| Traceability | Mandatory | Optional |
-| Contract diff | Required | Optional |
-RJ|| Gate checks | Full | Minimal |
-#JQ|
-#HV|## Vibe Guard - AI Integrity Checker
-#RT|
-#BQ|Vibe Guard is an **AI completion integrity checker** that prevents false completion claims from AI coding assistants. It detects common hallucination patterns and ensures code is actually complete before proceeding.
-#KY|
-#QM|### The Problem
-#RT|
-#XZ|AI coding assistants often claim completion when:
-#XZ|- TODO/FIXME placeholders remain in code
-#XZ|- Functions are empty stubs
-#XZ|- Tests always pass (fake assertions)
-#XZ|- Build/validation was never actually run
-#XZ|
-#BQ|Vibe Guard solves this by running automated checks that verify actual completion.
-#KY|
-#QM|### Three Modes
-#RT|
-#XZ|Vibe Guard supports three modes to balance speed vs. rigor:
-#XZ|
-#XZ|| Mode | Use Case | Blocking Conditions |
-#XZ||------|----------|---------------------|
-#XZ|| `vibe` | Rapid prototyping, POC | Build failure, critical security |
-#XZ|| `standard` | SME projects, team development | Build + security + core tests |
-#XZ|| `strict` | Enterprise, production | All checks fail |
-#KY|
-#QM|### Quick Usage
-#RT|
-#XZ|```bash
-#XZ|# Run with different modes
-#XZ|python skills/vibe-guard/validate-vibe-guard.py --mode vibe
-#XZ|python skills/vibe-guard/validate-vibe-guard.py --mode standard
-#XZ|python skills/vibe-guard/validate-vibe-guard.py --mode strict
-#XZ|
-#XZ|# Configuration (optional)
-#XZ|# Create .sdd-spec/vibe-guard.config.json
-#XZ|```
-#KY|
-#QM|### Check Categories
-#RT|
-#XZ|- **Completeness**: TODO/FIXME, empty functions, stub implementations
-#XZ|- **Security**: Hardcoded secrets, SQL injection, XSS vulnerabilities
-#XZ|- **Executability**: Build success, type checking, linting
-#XZ|- **Test Authenticity**: Fake tests, always-pass assertions, skipped tests
-#KY|
-#QM|### Integration
-#RT|
-#XZ|Vibe Guard can be invoked:
-#XZ|- **Standalone**: Manual check at any time
-#XZ|- **Via Orchestrator**: Integrated into SDD state transitions
-#XZ|- **Auto-trigger**: Detects completion phrases ("done", "ready", "complete")
-#JQ|
-#HQ|## Why This Toolkit
-
-## Why This Toolkit
-
-MJ|- Unified state flow: `Ideation -> Explore -> SpecCheckpoint -> Build -> Verify -> ReleaseReady -> Released`
-- Unified artifact constraints: spec, contract, tests, traceability matrix, release guard report
-- Unified machine validation: `validate-sdd.py` checks skill consistency and gate completeness
-- Multi-tool compatibility: supports both flat and multi-layer `skills` layouts
-
-## Included Skills
-
-- `sdd-orchestrator`: state-machine entry and routing
-- `spec-architect`: spec and contract design
-- `spec-to-codebase`: implementation generation from spec
-- `spec-contract-diff`: contract drift detection
-- `spec-driven-test`: spec-based testing gate
-- `spec-traceability`: requirement-contract-code-test traceability
-- `sdd-release-guard`: final pre-release gate
-- `vibe-guard`: AI completion integrity checker (prevents false completion claims)
-- `vibe-guard`: AI completion integrity checker (prevents false completion claims)
-- `spec-architect`: spec and contract design
-- `spec-to-codebase`: implementation generation from spec
-- `spec-contract-diff`: contract drift detection
-- `spec-driven-test`: spec-based testing gate
-- `spec-traceability`: requirement-contract-code-test traceability
-- `sdd-release-guard`: final pre-release gate
-
-## Artifact Storage
-
-All SDD artifacts are stored in the `.sdd-spec` directory to keep them separate from project code:
-
-```text
-.sdd-spec/
-  specs/              # Spec, contract, traceability files
-    <feature>.md
-    <feature>.contract.json
-    <feature>.traceability.yaml
-    <feature>.state.json
-    ...
-  tests/specs/       # Test files
-    <feature>.contract.spec.*
-    <feature>.acceptance.spec.*
-    ...
+```bash
+# Run vibe-guard
+python skills/vibe-guard/validate-vibe-guard.py --check
 ```
 
-> **Note**: The `.sdd-spec` directory is automatically ignored by version control (via `.gitignore`).
+### For Humans: After Significant Changes
 
-## Directory Layout
+```bash
+# Update tech-records
+python skills/vibe-integrity/validate-vibe-integrity.py  # First check integrity
 
-```text
+# Add new decision to .vibe-integrity/tech-records.yaml
+# Add new version to .vibe-integrity/schema-evolution.yaml  
+# Reflect new module relationships in .vibe-integrity/dependency-graph.yaml
+```
+
+## Directory Structure
+
+```
+.vibe-integrity/
+├── project.yaml              # Project metadata
+├── dependency-graph.yaml     # Module dependencies
+├── module-map.yaml          # Directory structure
+├── risk-zones.yaml          # Risk areas
+├── tech-records.yaml        # Technical decisions
+└── schema-evolution.yaml   # Data model changes
+
 skills/
-  sdd-orchestrator/
-    sdd-machine-schema.json
-    sdd-gate-checklist.json
-    validate-sdd.py
-    validate-sdd.config.single-layer.json
-    validate-sdd.config.multi-layer.json
-  spec-architect/
-  spec-to-codebase/
-  spec-contract-diff/
-  spec-driven-test/
-  spec-traceability/
-  sdd-release-guard/
-  vibe-guard/
-    SKILL.md
-    vibe-guard.config.json
-    validate-vibe-guard.py
+├── vibe-guard/             # Completion detection
+└── vibe-integrity/         # This skill
+    ├── SKILL.md
+    ├── validate-vibe-integrity.py
+    ├── validate-all.py
+    └── template/           # Schema templates
+        ├── project.schema.json
+        ├── dependency-graph.schema.json
+        ├── module-map.schema.json
+        ├── risk-zones.schema.json
+        ├── tech-records.schema.json
+        └── schema-evolution.schema.json
 ```
-skills/
-  sdd-orchestrator/
-    sdd-machine-schema.json
-    sdd-gate-checklist.json
-    validate-sdd.py
-    validate-sdd.config.single-layer.json
-    validate-sdd.config.multi-layer.json
-  spec-architect/
-  spec-to-codebase/
-  spec-contract-diff/
-  spec-driven-test/
-  spec-traceability/
-  sdd-release-guard/
+
+## Validation
+
+Run validation to ensure integrity:
+
+```bash
+python skills/vibe-integrity/validate-vibe-integrity.py  # checks .vibe-integrity/ files
+python skills/vibe-integrity/validate-all.py             # runs both vibe-guard and vibe-integrity validations
+python skills/vibe-guard/validate-vibe-guard.py --check  # AI completion check
 ```
+
+## Related Skills
+
+- `vibe-guard` - Completion detection
+- `superpowers/test-driven-development` - TDD workflow (optional)
+- `sdd-orchestrator` - SDD workflow (optional)
+
+**Note**: Vibe Integrity works with ANY development approach. You can use Vibe Integrity alone, or combine it with SDD, TDD, Agile, or any other methodology. The SDD and TDD skills listed above are optional add-ons for teams that wish to follow those specific methodologies while still benefiting from Vibe Integrity's completion guards and project memory.
 
 ## Quick Start
 
 1) Run default validation (scans `<root>/skills`):
 
 ```bash
-python skills/sdd-orchestrator/validate-sdd.py
+python skills/vibe-integrity/validate-all.py
 ```
 
-2) Use the single-layer template:
+2) Initialize Vibe Integrity in your project:
 
 ```bash
-python skills/sdd-orchestrator/validate-sdd.py --config skills/sdd-orchestrator/validate-sdd.config.single-layer.json
+# Create .vibe-integrity directory with template files
+python skills/vibe-integrity/validate-vibe-integrity.py --init
+
+# Or manually copy template files:
+cp -r skills/vibe-integrity/template/* .vibe-integrity/
 ```
 
-3) Use the multi-layer template:
-
-```bash
-python skills/sdd-orchestrator/validate-sdd.py --config skills/sdd-orchestrator/validate-sdd.config.multi-layer.json
-```
-
-4) Initialize a new project with bootstrap tool:
-
-```bash
-# Create new project structure
-python skills/sdd-orchestrator/bootstrap-sdd.py init ./my-project
-
-# Add a new feature
-python skills/sdd-orchestrator/bootstrap-sdd.py add my-feature ./my-project
-
-# Add skills directory
-python skills/sdd-orchestrator/bootstrap-sdd.py add-skills ./my-project
-```
-
+3) Customize the files for your project:
+   - Edit `.vibe-integrity/project.yaml` with your project details
+   - Update `.vibe-integrity/tech-records.yaml` with your technical decisions
+   - Customize `.vibe-integrity/risk-zones.yaml` for your project's risk areas
 
 ## Example Output
 
 A successful validation run looks like this:
 
 ```text
-SDD validation passed
+Vibe Integrity validation passed
 Root: D:\Code\aaa
-Skills paths:
-- D:\Code\aaa\skills
-Schema: D:\Code\aaa\skills\sdd-orchestrator\sdd-machine-schema.json
-Checklist: D:\Code\aaa\skills\sdd-orchestrator\sdd-gate-checklist.json
+Files checked:
+- .vibe-integrity/project.yaml ✓
+- .vibe-integrity/dependency-graph.yaml ✓
+- .vibe-integrity/module-map.yaml ✓
+- .vibe-integrity/risk-zones.yaml ✓
+- .vibe-integrity/tech-records.yaml ✓
+- .vibe-integrity/schema-evolution.yaml ✓
+
+Vibe Guard validation:
+- TODO/FIXME check: PASSED
+- Empty functions check: PASSED
+- Fake tests check: PASSED
+- Build success: PASSED
+- Type check: PASSED
+- Lint check: PASSED
+- Security check: PASSED
+- Test authenticity: PASSED
+
+All validations PASSED
 ```
 
-If `SDD validation passed` is shown, skill coverage, state enums, and gate checklist structure are all consistent.
+If `Vibe Integrity validation passed` is shown, all files are present and structurally valid.
 
 ## Configuration
 
-`validate-sdd.py` supports three configuration sources: CLI args, environment variables, and JSON config files.
+Vibe Integrity uses YAML files in the `.vibe-integrity/` directory for configuration.
 
-Precedence:
+### project.yaml
+```yaml
+name: my-project
+version: 0.1.0
+status: mvp
+description: "My amazing project"
+created_at: 2026-01-15
+last_updated: 2026-03-12
+tech_stack:
+  frontend: [Vue, Vite]
+  backend: [Express, Node]
+  database: [SQLite]
+```
 
-- `root_path`: CLI > environment > config file > script default
-- `skills_paths`: CLI + environment + config file (merged and deduplicated)
+### tech-records.yaml
+```yaml
+records:
+  - id: DB-001
+    date: "2026-01-15"
+    category: database
+    title: "Choose SQLite for MVP"
+    decision: "Use SQLite for fast iteration"
+    reason: "MVP phase prioritizes speed over scalability"
+    impact: low
+    status: completed
+```
 
-Common CLI options:
+## Common Operations
 
-- `--root-path`
-- `--skills-path` (repeatable)
-- `--orchestrator-path`
-- `--schema-path`
-- `--checklist-path`
-- `--recursive-search true|false`
-- `--config <json>`
+### Initialize new project structure
+```bash
+python skills/vibe-integrity/validate-vibe-integrity.py --init
+```
 
-Supported environment variables:
+### Validate integrity
+```bash
+python skills/vibe-integrity/validate-all.py
+```
 
-- `SDD_VALIDATE_CONFIG`
-- `SDD_ROOT_PATH`
-- `SDD_SKILLS_PATHS`
-- `SDD_ORCHESTRATOR_PATH`
-- `SDD_SCHEMA_PATH`
-- `SDD_CHECKLIST_PATH`
-- `SDD_RECURSIVE_SEARCH`
-
-## Common Failures and Fixes
-
-- `Unable to resolve sdd-orchestrator path from configured skills paths`
-  - Ensure `skills_paths` points to real skill roots
-  - Ensure `sdd-orchestrator` contains both `sdd-machine-schema.json` and `sdd-gate-checklist.json`
-- `SKILL.md not found for <skill>`
-  - Ensure the target skill directory exists
-  - For nested layouts, enable `--recursive-search true`
-- `missing schema reference` or `missing checklist reference`
-  - Ensure each skill `SKILL.md` references both schema and checklist
-- `State enum mismatch between schema and checklist`
-  - Align state enums between `sdd-machine-schema.json` and `sdd-gate-checklist.json`
-- `Checklist section incomplete for <skill>`
-  - Ensure checklist includes `entry_state`, `required_outputs`, and `gate_checks`
-
-## Open Source Release Notes
-
-- Keep all skill directories under top-level `skills/`
-- Avoid tool-private nesting like `.trae/skills/`
-- Run validation before every release
-- Commit `LICENSE` and `.gitignore` together with functional changes
+### AI completion check
+```bash
+python skills/vibe-guard/validate-vibe-guard.py --check
+```
 
 ## License
 
