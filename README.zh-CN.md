@@ -84,14 +84,20 @@ project/
 │       ├── README.md           # 英文文档
 │       └── *.py                # 脚本
 │
-├── skills-base/                # Skills 定义
-│   ├── vibe-think/             # 需求澄清
-│   ├── vibe-architect/          # 架构设计
-│   ├── vibe-develop/           # 开发流程
-│   ├── vibe-integrity/         # 记忆与验证
-│   └── vibe-debug/             # 调试
+├── skills/                         # Skills 定义 (统一)
+│   ├── vibe-think/              # 需求探索
+│   ├── vibe-architect/          # 技术选型 + 架构设计
+│   ├── vibe-debug/              # 系统性调试
+│   ├── spec-architect/          # SDD: 需求凝固
+│   ├── spec-to-codebase/        # SDD: 代码生成
+│   ├── spec-contract-diff/      # SDD: 代码对齐检查
+│   ├── spec-traceability/       # SDD: 追溯验证
+│   ├── spec-driven-test/        # SDD: 测试验证
+│   ├── sdd-release-guard/      # SDD: 发布守卫
+│   └── sdd-orchestrator/       # SDD: 编排器
 │
 ├── docs/                       # 设计文档
+│   ├── VIC-CLI-GUIDE.md       # CLI操作指南
 │   └── *.md
 │
 └── .vic-sdd/                   # 项目记忆与规范

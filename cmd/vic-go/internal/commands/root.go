@@ -37,6 +37,8 @@ For more information, visit: https://github.com/vic-sdd/vic
 	rootCmd.AddCommand(NewExportCmd(cfg))
 	rootCmd.AddCommand(NewImportCmd(cfg))
 	rootCmd.AddCommand(NewSpecCmd(cfg))
+	rootCmd.AddCommand(NewPhaseCmd(cfg))
+	rootCmd.AddCommand(NewGateCmd(cfg))
 
 	// Add flags
 	rootCmd.PersistentFlags().StringVarP(&cfg.OutputFormat, "output", "o", cfg.OutputFormat, "Output format (json, yaml, plain)")

@@ -34,12 +34,15 @@ vic spec gate 1 (Gate: Architecture Completeness)
 ### Phase 3: 立规矩 (Implementation)
 
 ```
-Agent-Develop uses vibe-develop
+Agent-Develop uses vic CLI + SDD Skills
     ↓
 Implementation + Tests
     ↓
-vic spec gate 2 (Code Alignment)
-vic spec gate 3 (Test Coverage)
+vic gate pass --gate 4 (Code Compiles)
+vic gate pass --gate 5 (Code Aligns SPEC)
+    ↓
+vic phase advance --to 3
+vic gate pass --gate 6-7
     ↓
 vic spec merge → PRD.md / ARCH.md / PROJECT.md
 ```
@@ -128,8 +131,13 @@ vic validate
 
 | Skill | Purpose |
 |-------|---------|
-| `vibe-think` | Requirements clarification |
-| `vibe-architect` | Architecture design |
-| `vibe-develop` | Implementation workflow |
-| `vibe-integrity` | Memory and validation |
+| `vibe-think` | Requirements clarification (探索阶段) |
+| `vibe-architect` | Architecture design (架构阶段) |
 | `vibe-debug` | Systematic debugging |
+| `spec-architect` | SDD: 需求凝固 |
+| `spec-to-codebase` | SDD: 代码生成 |
+| `spec-contract-diff` | SDD: 代码对齐检查 |
+| `spec-traceability` | SDD: 追溯验证 |
+| `sdd-release-guard` | SDD: 发布守卫 |
+
+> 注：详细CLI命令参考 [VIC-CLI-GUIDE.md](./docs/VIC-CLI-GUIDE.md)

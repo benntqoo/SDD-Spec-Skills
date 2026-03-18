@@ -130,3 +130,40 @@ type EventsFile struct {
 type StateFile struct {
 	State State `yaml:"state"`
 }
+
+// ============================================
+// Phase Types (SDD Flow)
+// ============================================
+
+// Phase represents a development phase
+type Phase struct {
+	Name            string          `yaml:"name"`
+	Status          string          `yaml:"status"` // pending, in_progress, completed
+	StartedAt       string          `yaml:"started_at"`
+	CompletedAt     string          `yaml:"completed_at"`
+	Completion      int             `yaml:"completion"` // 0-100
+	OutputsRequired []string        `yaml:"outputs_required"`
+	Gates           map[string]Gate `yaml:"gates"`
+}
+
+// Gate represents a gate check
+type Gate struct {
+	Name        string `yaml:"name"`
+	Status      string `yaml:"status"` // pending, passed, failed
+	CheckedAt   string `yaml:"checked_at"`
+	CheckedBy   string `yaml:"checked_by"`
+	Notes       string `yaml:"notes"`
+	Description string `yaml:"description"`
+	Phase       int    `yaml:"phase"`
+}
+
+// PhaseFile represents the phase status file
+type PhaseFile struct {
+	CycleID      string        `yaml:"cycle_id"`
+	CycleName    string        `yaml:"cycle_name"`
+	CurrentPhase int           `yaml:"current_phase"`
+	CurrentGate  int           `yaml:"current_gate"`
+	StartedAt    string        `yaml:"started_at"`
+	LastUpdated  string        `yaml:"last_updated"`
+	Phases       map[int]Phase `yaml:"phases"`
+}

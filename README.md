@@ -61,13 +61,13 @@ See [cmd/vic/README.md](./cmd/vic/README.md) for full documentation.
 ```
 定图纸 (Requirements)     打地基 (Architecture)    立规矩 (Implementation)
         │                          │                         │
-   vibe-think              vibe-architect            vibe-develop
+   vibe-think              vibe-architect            vic CLI + SDD Skills
         │                          │                         │
         ▼                          ▼                         ▼
 SPEC-REQUIREMENTS.md  ──▶  SPEC-ARCHITECTURE.md  ──▶  Implementation
         │                          │                         │
         ▼                          ▼                         ▼
-   Gate 0                    Gate 1                  Gate 2 + 3
+   Gate 0                    Gate 1                  Gate 4 + 5
 (Requirements)          (Architecture)           (Code + Tests)
                                                         │
                                                         ▼
@@ -84,14 +84,18 @@ project/
 │       ├── README.md            # English docs
 │       └── *.py                 # Scripts
 │
-├── skills-base/                # Skills definitions
-│   ├── vibe-think/            # Requirements clarification
-│   ├── vibe-architect/        # Architecture design
-│   ├── vibe-develop/          # Implementation workflow
-│   ├── vibe-integrity/         # Memory and validation
-│   └── vibe-debug/            # Debugging
+├── skills/                         # Skills definitions (merged)
+│   ├── vibe-think/               # Requirements clarification
+│   ├── vibe-architect/           # Architecture design
+│   ├── vibe-debug/               # Debugging
+│   ├── spec-architect/           # SDD: 需求凝固
+│   ├── spec-to-codebase/         # SDD: 代码生成
+│   ├── spec-contract-diff/       # SDD: 代码对齐检查
+│   ├── spec-traceability/        # SDD: 追溯验证
+│   └── sdd-release-guard/       # SDD: 发布守卫
 │
 ├── docs/                      # Design docs
+│   ├── VIC-CLI-GUIDE.md        # CLI操作指南
 │   └── *.md
 │
 └── .vic-sdd/                  # Project memory & specs
@@ -146,7 +150,9 @@ When AI starts on this project, read in order:
 | Initialize SPEC | `vic spec init` |
 | Made a decision | `vic rt` |
 | Found a risk | `vic rr` |
-| Before progression | `vic spec gate [0-3]` |
+| Before progression | `vic phase advance` |
+| Check phase | `vic phase status` |
+| Pass gate | `vic gate pass --gate N` |
 | AI claims "done" | `vic check` |
 | Before commit | `vic validate` |
 | Backup memory | `vic export` |
@@ -157,9 +163,14 @@ When AI starts on this project, read in order:
 |-------|---------|
 | `vibe-think` | Requirements clarification |
 | `vibe-architect` | Architecture design |
-| `vibe-develop` | Implementation workflow |
-| `vibe-integrity` | Memory and validation |
 | `vibe-debug` | Systematic debugging |
+| `spec-architect` | SDD: 需求凝固 |
+| `spec-to-codebase` | SDD: 代码生成 |
+| `spec-contract-diff` | SDD: 代码对齐检查 |
+| `spec-traceability` | SDD: 追溯验证 |
+| `sdd-release-guard` | SDD: 发布守卫 |
+
+> 注：CLI命令详细用法见 [VIC-CLI-GUIDE.md](./docs/VIC-CLI-GUIDE.md)
 
 ## Installation
 

@@ -1,4 +1,4 @@
-# SPEC-ARCHITECTURE: <项目名称>
+# SPEC-ARCHITECTURE: VIBE-SDD CLI
 
 > 此文档为技术架构规范，定义了项目的技术选型、系统架构和数据模型。
 > 详细需求请参考 SPEC-REQUIREMENTS.md。
@@ -10,10 +10,10 @@
 | 字段 | 值 |
 |------|-----|
 | version | 1.0.0 |
-| status | draft / spec / build / verify / done |
-| owner | @agent-name |
-| created | YYYY-MM-DD |
-| updated | YYYY-MM-DD |
+| status | spec |
+| owner | @sisyphus |
+| created | 2026-03-18 |
+| updated | 2026-03-18 |
 
 ---
 
@@ -23,48 +23,24 @@
 
 | 层级 | 技术 | 版本 | 状态 |
 |------|------|------|------|
-| 前端框架 | [React/Vue/其他] | x.x.x | 选中 |
-| 状态管理 | [Zustand/Redux/Pinia] | x.x.x | 选中 |
-| 后端框架 | [Next.js/Express/其他] | x.x.x | 选中 |
-| 数据库 | [PostgreSQL/MySQL/其他] | x.x.x | 选中 |
-| ORM | [Prisma/Drizzle/其他] | x.x.x | 选中 |
-| 认证 | [JWT/Session/其他] | - | 选中 |
-| 部署 | [Vercel/AWS/其他] | - | 选中 |
+| CLI框架 | Cobra | v1.2.0+ | 选中 |
+| 配置文件 | Viper | v1.18.0+ | 选中 |
+| 数据存储 | YAML | - | 选中 |
+| 测试 | Go testing | 内置 | 选中 |
+| 构建 | Make | - | 选中 |
 
-### 1.2 技术选型评估
+**最终选择**: Go 1.21+  
+**选择理由**: 单一二进制，跨平台，无运行时依赖，启动快
 
-#### 前端框架
-
-| 技术 | 优点 | 缺点 | 适用场景 |
-|------|------|------|---------|
-| React | 生态大、灵活性高 | 学习曲线陡 | 中大型项目 |
-| Vue | 上手简单、文档好 | 灵活性略低 | 快速开发 |
-| Svelte | 性能好、代码少 | 生态较小 | 轻量项目 |
-
-**最终选择**: [技术名称]
-**选择理由**: [简明理由]
-
-#### 数据库
-
-| 技术 | 优点 | 缺点 | 适用场景 |
-|------|------|------|---------|
-| PostgreSQL | ACID、JSON支持 | 资源需求高 | 事务性数据 |
-| MySQL | 成熟稳定 | JSON支持一般 | 通用场景 |
-| MongoDB | 灵活、易扩展 | 事务弱 | 文档数据 |
-
-**最终选择**: [技术名称]
-**选择理由**: [简明理由]
-
-### 1.3 开发工具
+### 1.2 开发工具
 
 | 工具 | 用途 | 选择 |
 |------|------|------|
-| 语言 | 开发语言 | TypeScript |
-| 包管理 | 依赖管理 | pnpm |
-| 代码规范 | Linting | ESLint |
-| 代码格式 | Formatting | Prettier |
-| 测试 | 单元测试 | Vitest |
-| 构建 | 打包 | Vite |
+| 语言 | 开发语言 | Go |
+| 包管理 | 依赖管理 | Go modules |
+| CLI框架 | 命令行 | Cobra + Viper |
+| 代码规范 | Linting | golangci-lint |
+| 测试 | 单元测试 | Go testing |
 
 ---
 
@@ -74,364 +50,202 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                         客户端                              │
-│         (Web / Mobile / Desktop)                            │
-│                                                              │
-│   ┌─────────────┐  ┌─────────────┐  ┌─────────────┐       │
-│   │   页面 A    │  │   页面 B    │  │   页面 C    │       │
-│   └──────┬──────┘  └──────┬──────┘  └──────┬──────┘       │
-│          │                │                │              │
-│          └────────────────┼────────────────┘              │
-│                           ▼                                │
-│                    ┌─────────────┐                         │
-│                    │  状态管理   │                         │
-│                    └──────┬──────┘                         │
-└───────────────────────────┼────────────────────────────────┘
-                            │ HTTPS
+│                         CLI 客户端                          │
+│                           vic                               │
+└───────────────────────────┬────────────────────────────────┘
+                            │
                             ▼
 ┌───────────────────────────────────────────────────────────────┐
-│                      接入层                                  │
-│                                                              │
-│   ┌─────────────────────────────────────────────────────┐   │
-│   │                   Next.js / Express                   │   │
-│   │   - SSR / CSR                                       │   │
-│   │   - API Routes / Controllers                        │   │
-│   │   - Middleware (鉴权、日志)                          │   │
-│   └─────────────────────────────────────────────────────┘   │
-│                           │                                 │
-└───────────────────────────┼────────────────────────────────┘
+│                      命令层 (Cobra)                          │
+│                                                               │
+│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐         │
+│  │  init   │  │ record  │  │ status  │  │  spec   │   ...   │
+│  └────┬────┘  └────┬────┘  └────┬────┘  └────┬────┘         │
+└───────┼────────────┼────────────┼────────────┼───────────────┘
+        │            │            │            │
+        ▼            ▼            ▼            ▼
+┌───────────────────────────────────────────────────────────────┐
+│                       业务逻辑层                              │
+│                                                               │
+│  ┌─────────────────────────────────────────────────────┐     │
+│  │                  config (配置加载)                    │     │
+│  └─────────────────────────────────────────────────────┘     │
+│                                                               │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐           │
+│  │   commands  │  │   checker   │  │    utils    │           │
+│  └─────────────┘  └─────────────┘  └─────────────┘           │
+└───────────────────────────┬────────────────────────────────┘
                             │
-              ┌─────────────┴─────────────┐
-              ▼                           ▼
-┌─────────────────────────┐   ┌─────────────────────────────┐
-│       业务服务层          │   │        外部服务             │
-│                          │   │                             │
-│  ┌───────────────────┐  │   │  ┌─────────────┐           │
-│  │   Auth Service    │  │   │  │  支付网关    │           │
-│  │   - 登录/注册    │  │   │  └─────────────┘           │
-│  │   - Token 签发   │  │   │  ┌─────────────┐           │
-│  └───────────────────┘  │   │  │  邮件服务    │           │
-│  ┌───────────────────┐  │   │  └─────────────┘           │
-│  │   User Service   │  │   │  ┌─────────────┐           │
-│  │   - 用户资料     │  │   │  │    CDN      │           │
-│  │   - 权限管理     │  │   │  └─────────────┘           │
-│  └───────────────────┘  │   │                             │
-│  ┌───────────────────┐  │   │                             │
-│  │  Order Service   │  │   │                             │
-│  └───────────────────┘  │   │                             │
-└───────────┬─────────────┘   └─────────────────────────────┘
-            │
-            ▼
-┌─────────────────────────────────────────────────────────────┐
-│                       数据层                                │
-│                                                              │
-│   ┌─────────────┐        ┌─────────────┐                   │
-│   │ PostgreSQL  │        │    Redis    │                   │
-│   │   (主库)   │        │   (缓存)    │                   │
-│   └─────────────┘        └─────────────┘                   │
-│                                                              │
-└─────────────────────────────────────────────────────────────┘
+                            ▼
+┌───────────────────────────────────────────────────────────────┐
+│                        数据层                                 │
+│                                                               │
+│   ┌─────────────┐        ┌─────────────┐                     │
+│   │  .vic-sdd/  │        │    YAML     │                     │
+│   │  (文件存储)  │        │   文件操作   │                     │
+│   └─────────────┘        └─────────────┘                     │
+└───────────────────────────────────────────────────────────────┘
 ```
 
 ### 2.2 模块划分
 
 | 模块 | 职责 | 依赖 | 边界 |
 |------|------|------|------|
-| auth | 用户认证、JWT 签发和验证 | 数据库 | 服务端 |
-| user | 用户资料管理、权限 | auth | 服务端 |
-| order | 订单管理、状态流转 | user, payment | 服务端 |
-| notification | 消息通知、推送 | 外部服务 | 服务端 |
+| commands | CLI命令实现 | Cobra | 入口 |
+| config | 配置加载和管理 | Viper | 基础设施 |
+| checker | 代码对齐检查 | 无 | 业务 |
+| utils | 文件/YAML工具 | 无 | 基础设施 |
+| types | 类型定义 | 无 | 基础设施 |
 
 ---
 
-## 3. 数据模型
-
-### 3.1 核心实体
-
-#### User (用户)
-
-```typescript
-interface User {
-  id: UUID;           // 主键
-  email: string;      // 唯一索引
-  passwordHash: string;
-  name: string;
-  role: 'admin' | 'user';
-  createdAt: DateTime;
-  updatedAt: DateTime;
-}
-```
-
-#### Order (订单)
-
-```typescript
-interface Order {
-  id: UUID;                    // 主键
-  userId: UUID;               // 外键 -> User
-  status: OrderStatus;        // 枚举
-  totalAmount: Decimal;
-  items: OrderItem[];
-  createdAt: DateTime;
-  updatedAt: DateTime;
-}
-
-enum OrderStatus {
-  PENDING = 'pending',
-  PAID = 'paid',
-  CANCELLED = 'cancelled',
-  REFUNDED = 'refunded'
-}
-```
-
-### 3.2 关系图
+## 3. 目录结构
 
 ```
-┌─────────┐       ┌─────────┐
-│  User   │ 1   ∞ │  Order  │
-│ (用户)  │───────│ (订单)  │
-└─────────┘       └────┬────┘
-                      │
-                      │ 1
-                      │ 
-                      ∞
-                 ┌────┴────┐
-                 │OrderItem │
-                 │(订单项)  │
-                 └─────────┘
+cmd/vic-go/
+├── main.go                 # 入口文件
+├── Makefile               # 构建配置
+├── go.mod                # 依赖管理
+├── go.sum                # 依赖锁定
+├── README.md             # 项目文档
+│
+├── internal/
+│   ├── commands/         # CLI命令实现
+│   │   ├── root.go       # 根命令
+│   │   ├── init.go       # vic init
+│   │   ├── record.go     # vic record
+│   │   ├── spec.go       # vic spec
+│   │   ├── check.go      # vic check
+│   │   ├── status.go     # vic status
+│   │   ├── misc.go       # 其他命令
+│   │   └── ...
+│   │
+│   ├── config/           # 配置管理
+│   │   └── config.go
+│   │
+│   ├── checker/          # 代码检查
+│   │   └── code_analysis.go
+│   │
+│   ├── types/            # 类型定义
+│   │   └── types.go
+│   │
+│   └── utils/            # 工具函数
+│       ├── file.go
+│       └── yaml.go
 ```
 
-### 3.3 索引设计
+## 4. API/命令设计
 
-| 表 | 索引类型 | 字段 | 说明 |
-|----|---------|------|------|
-| User | unique | email | 登录查询 |
-| User | index | createdAt | 排序 |
-| Order | index | userId | 用户订单查询 |
-| Order | index | status + createdAt | 状态筛选 |
+### 4.1 命令目录
 
----
-
-## 4. API 设计
-
-### 4.1 API 目录
-
-| 路由 | 方法 | 功能 | 鉴权 | 状态 |
-|------|------|------|------|------|
-| /api/auth/login | POST | 登录 | 否 | done |
-| /api/auth/register | POST | 注册 | 否 | done |
-| /api/auth/refresh | POST | 刷新Token | 是 | done |
-| /api/users | GET | 用户列表 | 是 | done |
-| /api/users/:id | GET | 用户详情 | 是 | done |
-
-### 4.2 API 契约示例
-
-#### POST /api/auth/login
-
-**请求**
-```json
-{
-  "email": "user@example.com",
-  "password": "string"
-}
-```
-
-**响应 (200)**
-```json
-{
-  "success": true,
-  "data": {
-    "token": "eyJhbGciOiJIUzI1NiIs...",
-    "expiresIn": 3600,
-    "user": {
-      "id": "uuid",
-      "email": "user@example.com",
-      "name": "用户名"
-    }
-  }
-}
-```
-
-**错误响应**
-| 状态码 | 场景 | 响应 |
-|--------|------|------|
-| 401 | 密码错误 | `{"success": false, "error": "Invalid credentials"}` |
-| 404 | 用户不存在 | `{"success": false, "error": "User not found"}` |
-
-### 4.3 错误码规范
-
-```typescript
-// 错误码格式: 模块_序号
-// 认证模块: AUTH_001, AUTH_002
-// 用户模块: USER_001, USER_002
-
-enum ErrorCode {
-  // 认证模块
-  AUTH_001 = 'Invalid credentials',
-  AUTH_002 = 'Token expired',
-  AUTH_003 = 'Token invalid',
-  
-  // 用户模块
-  USER_001 = 'User not found',
-  USER_002 = 'Email already exists',
-}
-```
-
----
-
-## 5. 安全设计
-
-### 5.1 鉴权授权
-
-#### 认证流程
-
-```
-1. 用户提交 credentials
-2. 服务端验证
-3. 生成 JWT (access + refresh)
-4. 返回 token
-5. 客户端存储
-6. 后续请求携带 access token
-7. 服务端验证 token
-8. 放行或拒绝
-```
-
-#### 权限模型
-
-| 角色 | 权限 |
-|------|------|
-| admin | 全部权限 |
-| user | 自身资源读写 |
-
-### 5.2 安全清单
-
-| 项 | 实现 | 说明 |
-|---|------|------|
-| HTTPS | ✅ | 全站强制 |
-| HSTS | ✅ | 启用 |
-| JWT 过期 | ✅ | 1小时 |
-| 刷新Token | ✅ | 7天 |
-| 密码哈希 | ✅ | bcrypt (12 rounds) |
-| SQL注入 | ✅ | ORM 参数化查询 |
-| XSS | ✅ | React 默认防护 |
-| CSRF | ✅ | SameSite Cookie |
-| CORS | ✅ | 白名单配置 |
-| 速率限制 | ✅ | 100req/15min |
-
-### 5.3 敏感数据处理
-
-| 数据 | 存储 | 传输 | 日志 |
+| 命令 | 方法 | 功能 | 状态 |
 |------|------|------|------|
-| 密码 | bcrypt 哈希 | - | 禁止 |
-| Token | - | HttpOnly Cookie | 禁止 |
-| 信用卡 | 第三方处理 | 加密 | 禁止 |
-| PII | 加密存储 | HTTPS | 脱敏 |
+| vic init | - | 初始化项目 | done |
+| vic rt / vic record tech | - | 记录技术决策 | done |
+| vic rr / vic record risk | - | 记录风险 | done |
+| vic status | - | 显示状态 | done |
+| vic check | - | 代码对齐检查 | done |
+| vic validate | - | 完整验证 | done |
+| vic spec init | - | 初始化SPEC | done |
+| vic spec gate | - | Gate检查 | done |
+
+## 4. 命令设计
+
+### 4.1 命令目录
+
+| 命令 | 功能 | 状态 |
+|------|------|------|
+| vic init | 初始化项目 | done |
+| vic record tech (vic rt) | 记录技术决策 | done |
+| vic record risk (vic rr) | 记录风险 | done |
+| vic status | 显示状态 | done |
+| vic check | 代码对齐检查 | done |
+| vic validate | 完整验证 | done |
+| vic spec init | 初始化SPEC | done |
+| vic spec gate | Gate检查 | done |
+| vic fold | 事件折叠 | done |
+| vic search | 搜索 | done |
+| vic history | 历史记录 | done |
+| vic export | 导出数据 | done |
+| vic import | 导入数据 | done |
 
 ---
 
-## 6. 服务端边界
+## 5. 核心模块详解
 
-### 6.1 必须服务端处理
+### 5.1 commands 模块
 
-| 场景 | 原因 |
+负责所有CLI命令的实现：
+
+| 命令文件 | 功能 | 依赖 |
+|---------|------|------|
+| init.go | vic init - 初始化项目 | utils, config |
+| record.go | vic record - 记录决策/风险 | utils, config |
+| spec.go | vic spec - SPEC文档管理 | utils, config |
+| check.go | vic check - 代码对齐检查 | checker |
+| status.go | vic status - 状态显示 | config |
+| fold.go | vic fold - 事件折叠 | utils |
+| search.go | vic search - 搜索 | utils |
+| export.go / import.go | 数据导出导入 | utils |
+
+### 5.2 checker 模块
+
+代码对齐检查功能：
+
+| 功能 | 说明 |
 |------|------|
-| 用户认证 | 安全性 |
-| 支付处理 | 敏感操作 |
-| 权限校验 | 业务规则 |
-| 业务逻辑 | 数据一致性 |
-| 第三方API调用 | 密钥安全 |
+| code_analysis.go | 分析代码结构与SPEC一致性 |
+| 规则引擎 | 可扩展的检查规则 |
 
-### 6.2 可客户端处理
+### 5.3 utils 模块
 
-| 场景 | 说明 |
+| 功能 | 说明 |
 |------|------|
-| 表单验证 | 提升体验 |
-| UI 状态 | 响应速度 |
-| 缓存同步 | 离线支持 |
-| 简单计算 | 减轻服务端 |
+| file.go | 文件操作工具 |
+| yaml.go | YAML读写工具 |
 
-### 6.3 服务间通信
+---
 
-```
-┌──────────────┐     ┌──────────────┐
-│   Service A  │────▶│   Service B  │
-│              │ HTTP│              │
-└──────────────┘     └──────────────┘
-        │
-        │ 可选: 消息队列
-        ▼
-┌──────────────┐
-│   Service C  │
-└──────────────┘
-```
+## 6. 配置文件
+
+### 6.1 环境变量
+
+| 变量 | 默认值 | 说明 |
+|------|-------|------|
+| VIC_DIR | .vic-sdd | VIC目录名 |
+| VIC_PROJECT_DIR | 当前目录 | 项目目录 |
+| VIC_OUTPUT | plain | 输出格式 |
+| VIC_VERBOSE | false | 详细输出 |
 
 ---
 
 ## 7. 部署和运维
 
-### 7.1 环境
+### 7.1 构建
 
-| 环境 | 用途 | URL |
-|------|------|-----|
-| Dev | 开发自测 | dev.local |
-| Staging | 预发布测试 | staging.example.com |
-| Prod | 生产环境 | example.com |
-
-### 7.2 部署流程
-
-```
-Git Push → CI Build → Test → Deploy to Staging → Manual Verify → Deploy to Prod
+```bash
+cd cmd/vic-go
+make build    # 构建当前平台
+make build-all # 跨平台构建
+make install  # 安装到PATH
 ```
 
-### 7.3 监控
+### 7.2 发布
 
-| 工具 | 用途 |
+| 平台 | 格式 |
 |------|------|
-| Sentry | 错误追踪 |
-| Vercel Analytics | 性能监控 |
-| Datadog | 基础设施 |
-
-### 7.4 备份
-
-| 数据 | 策略 |
-|------|------|
-| 数据库 | 每日全量 + 增量 |
-| 文件 | 每日同步 |
+| Linux | vic-{version}-linux-amd64.tar.gz |
+| macOS | vic-{version}-darwin-amd64.tar.gz |
+| Windows | vic-{version}-windows-amd64.zip |
 
 ---
 
-## 8. 目录结构
-
-```
-project/
-├── src/
-│   ├── components/      # 公共组件
-│   ├── pages/           # 页面 (或 routes/)
-│   ├── services/        # 服务层
-│   ├── utils/          # 工具函数
-│   ├── hooks/          # 自定义 Hooks
-│   ├── types/          # 类型定义
-│   └── styles/         # 样式
-│
-├── server/
-│   ├── api/            # API 路由
-│   ├── services/       # 业务服务
-│   ├── models/         # 数据模型
-│   ├── middleware/     # 中间件
-│   └── utils/         # 服务端工具
-│
-├── prisma/             # ORM 配置
-├── tests/             # 测试文件
-└── docs/              # 文档
-```
-
----
-
-## 9. 变更历史
+## 8. 变更历史
 
 | 日期 | 变更内容 | 变更人 | 原因 |
 |------|---------|--------|------|
-| YYYY-MM-DD | 创建文档 | - | 初始版本 |
-| YYYY-MM-DD | [变更内容] | [变更人] | [原因] |
+| 2026-03-18 | 初始版本 | @sisyphus | 创建SPEC-ARCHITECTURE |
+| 2026-03-18 | 补充CLI架构 | @sisyphus | Phase 1 架构设计 |
 
 ---
 
@@ -441,16 +255,19 @@ project/
 
 - SPEC-REQUIREMENTS.md - 需求规范
 - PROJECT.md - 项目状态追踪
+- docs/SDD-PROCESS-CN.md - SDD流程规范
 
 ### B. 参考资料
 
-- [技术文档链接]
-- [架构设计参考]
+- Cobra文档: https://cobra.dev
+- Viper文档: https://github.com/spf13/viper
 
 ### C. 术语表
 
 | 术语 | 定义 |
 |------|------|
-| JWT | JSON Web Token |
-| ORM | Object-Relational Mapping |
-| ACID | Atomicity, Consistency, Isolation, Durability |
+| CLI | Command-Line Interface 命令行工具 |
+| Cobra | Go语言CLI框架 |
+| Viper | Go语言配置管理库 |
+| Gate | 阶段检查点 |
+| SPEC | 需求/架构规范文档 |

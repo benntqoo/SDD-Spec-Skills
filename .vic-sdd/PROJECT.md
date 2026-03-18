@@ -23,19 +23,19 @@
 
 | 项目 | 内容 |
 |------|------|
-| 项目名称 | [名称] |
-| 项目类型 | [Web App / Mobile / SaaS / Internal] |
-| 核心价值 | [一句话描述] |
-| 目标用户 | [用户群体] |
+| 项目名称 | VIBE-SDD |
+| 项目类型 | CLI工具 |
+| 核心价值 | AI驱动的Spec-Driven Development开发流程工具，解决AI开发中的幻觉、盲目、失序问题 |
+| 目标用户 | 使用AI辅助开发的团队/个人 |
 
 ### 1.2 技术栈
 
 | 类别 | 技术 |
 |------|------|
-| 前端 | [React + TypeScript] |
-| 后端 | [Next.js API Routes] |
-| 数据库 | [PostgreSQL + Prisma] |
-| 部署 | [Vercel] |
+| CLI开发 | Go 1.21+ |
+| 配置存储 | YAML |
+| 验证脚本 | Python 3.10+ |
+| 构建系统 | Make |
 
 ### 1.3 团队
 
@@ -44,7 +44,7 @@
 | Product | @agent-product | 需求分析、验收标准 |
 | Architect | @agent-architect | 技术选型、架构设计 |
 | Developer | @agent-develop | 代码实现、测试 |
-| Lead | @agent-lead | 审核、里程碑验收 |
+| Lead | @agent-sisyphus | 审核、里程碑验收 |
 
 ---
 

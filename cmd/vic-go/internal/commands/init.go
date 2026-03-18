@@ -71,6 +71,9 @@ func runInit(cfg *config.Config) error {
 	// Initialize SPEC documents
 	runSpecInit(cfg)
 
+	// Initialize phase status
+	InitializePhaseFile(cfg, "default")
+
 	fmt.Printf("✅ Initialized .vic-sdd/ directory\n")
 	fmt.Printf("   Project: %s\n", initName)
 	fmt.Printf("   Tech: %s\n", initTech)

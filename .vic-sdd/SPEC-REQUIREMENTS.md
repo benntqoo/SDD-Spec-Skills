@@ -1,4 +1,4 @@
-# SPEC-REQUIREMENTS: <项目名称>
+# SPEC-REQUIREMENTS: VIBE-SDD CLI
 
 > 此文档为需求规范，定义了项目的功能需求、验收标准和开发阶段划分。
 > 详细技术架构请参考 SPEC-ARCHITECTURE.md。
@@ -10,11 +10,11 @@
 | 字段 | 值 |
 |------|-----|
 | version | 1.0.0 |
-| status | draft / spec / build / verify / done |
-| owner | @agent-name |
-| phase | 当前开发阶段 |
-| created | YYYY-MM-DD |
-| updated | YYYY-MM-DD |
+| status | spec |
+| owner | @sisyphus |
+| phase | Phase 0 - 需求凝固 |
+| created | 2026-03-18 |
+| updated | 2026-03-18 |
 
 ---
 
@@ -22,24 +22,23 @@
 
 ### 1.1 目标和愿景
 
-[一句话描述项目要解决的核心问题]
-
-**示例**: "为小型团队提供轻量级的项目管理工具，核心解决任务分配和进度追踪的痛点"
+为AI辅助开发团队提供结构化的Spec-Driven Development流程工具，核心解决：
+- **防幻觉**：每个决策必须有据可查
+- **防盲目**：每个阶段必须有明确产出
+- **防失序**：进度必须透明可追溯
 
 ### 1.2 目标用户
 
-[目标用户群体描述]
-
-**示例**:
-- 5-20 人的小型团队
-- 项目经理和产品经理
-- 远程协作团队
+- 使用AI辅助开发的个人开发者
+- 使用AI辅助开发的团队
+- 需要规范化开发流程的Project Owner
 
 ### 1.3 成功指标
 
-- [ ] 指标 1: 具体可量化目标 (如：用户注册量达到 1000)
-- [ ] 指标 2: 具体可量化目标 (如：核心流程完成率达到 95%)
-- [ ] 指标 3: 具体可量化目标
+- [ ] CLI工具基本功能完成 (vic init, vic status, vic record)
+- [ ] SPEC文档管理功能完成 (vic spec init, vic spec gate)
+- [ ] Gate检查机制正常运行
+- [ ] 代码对齐检查功能完成
 
 ---
 
@@ -49,10 +48,12 @@
 
 | ID | 故事描述 | 优先级 | 阶段 |
 |----|---------|--------|------|
-| US-001 | 作为[角色]，我想要[功能]，以便[价值] | P0 | Phase 1 |
-| US-002 | 作为[角色]，我想要[功能]，以便[价值] | P1 | Phase 1 |
-| US-003 | 作为[角色]，我想要[功能]，以便[价值] | P1 | Phase 2 |
-| US-004 | 作为[角色]，我想要[功能]，以便[价值] | P2 | Phase 2 |
+| US-001 | 作为AI开发者，我想要通过CLI命令初始化项目结构，以便快速开始开发 | P0 | Phase 1 |
+| US-002 | 作为AI开发者，我想要记录技术决策并追踪原因，以便后续回顾 | P0 | Phase 1 |
+| US-003 | 作为AI开发者，我想要通过Gate检查确保质量，以便按阶段推进 | P0 | Phase 1 |
+| US-004 | 作为Project Owner，我想要查看项目当前状态和进度，以便掌控全局 | P1 | Phase 1 |
+| US-005 | 作为AI开发者，我想要SPEC文档管理功能，以便规范化需求 | P1 | Phase 2 |
+| US-006 | 作为AI开发者，我想要代码对齐检查，以便确保实现符合设计 | P1 | Phase 2 |
 
 **模板**: 作为 [角色]，我想要 [功能]，以便 [价值]
 
@@ -64,25 +65,44 @@
 
 | ID | 功能名称 | 用户故事 | 阶段 | 状态 |
 |----|---------|---------|------|------|
-| F-001 | [功能名称] | US-001 | Phase 1 | pending |
-| F-002 | [功能名称] | US-002 | Phase 1 | pending |
-| F-003 | [功能名称] | US-003 | Phase 2 | pending |
+| F-001 | 项目初始化 | US-001 | Phase 1 | in_progress |
+| F-002 | 技术决策记录 | US-002 | Phase 1 | completed |
+| F-003 | Gate检查 | US-003 | Phase 1 | pending |
+| F-004 | 项目状态查看 | US-004 | Phase 1 | pending |
+| F-005 | SPEC文档管理 | US-005 | Phase 2 | pending |
+| F-006 | 代码对齐检查 | US-006 | Phase 2 | pending |
 
 ### 3.2 功能详细
 
-#### F-001: [功能名称]
+#### F-001: 项目初始化
 
-**描述**: [简明描述此功能做什么]
+**描述**: 通过vic init命令初始化.vic-sdd目录结构
 
 **用户故事**: US-001
 
 **业务规则**:
-1. [规则 1]
-2. [规则 2]
+1. 默认创建.vic-sdd目录，可通过VIC_DIR环境变量指定
+2. 初始化基础文件：project.yaml, status/state.yaml, tech/tech-records.yaml
+3. 支持--name指定项目名称
+4. 支持--tech指定技术栈
 
 **依赖**:
-- F-000 (前置功能)
-- 外部服务: [依赖说明]
+- 无外部依赖
+
+#### F-002: 技术决策记录
+
+**描述**: 通过vic record tech命令记录技术决策
+
+**用户故事**: US-002
+
+**业务规则**:
+1. 必须包含id, title, decision字段
+2. 可选包含reason, alternatives, impact字段
+3. 记录保存到.vic-sdd/tech/tech-records.yaml
+4. 支持别名: vic rt
+
+**依赖**:
+- F-001 (前置功能)
 
 ---
 
@@ -92,31 +112,20 @@
 
 | ID | 功能 | 验收条件 | 测试方式 | 状态 |
 |----|------|---------|---------|------|
-| AC-001 | F-001 | [Given] 初始状态 [When] 操作 [Then] 期望结果 | 手动/自动化 | pending |
-| AC-002 | F-001 | [Given] 初始状态 [When] 操作 [Then] 期望结果 | 手动/自动化 | pending |
-| AC-003 | F-002 | [Given] 初始状态 [When] 操作 [Then] 期望结果 | 手动/自动化 | pending |
+| AC-001 | F-001 | vic init执行后，.vic-sdd目录及基础文件被创建 | 手动 | pending |
+| AC-002 | F-001 | vic init --name "Test" 创建的项目名正确 | 手动 | pending |
+| AC-003 | F-002 | vic rt --id TEST-001 --title "Test" --decision "Test decision" 成功记录 | 手动 | pending |
+| AC-004 | F-002 | 记录保存到tech-records.yaml，格式正确 | 手动 | pending |
+| AC-005 | F-003 | vic spec gate 0 返回Gate检查结果 | 手动 | pending |
+| AC-006 | F-004 | vic status 显示当前项目状态 | 手动 | pending |
 
-### 4.2 验收条件模板
-
-```
-[Given] 初始状态或前置条件
-[When]  用户执行的操作
-[Then]  期望的系统响应或结果
-```
-
-**示例**:
-```
-[Given] 用户已登录且拥有管理员角色
-[When]  访问 /admin/users 页面
-[Then]  显示用户列表，包含所有已注册用户
-```
-
-### 4.3 边界情况
+### 4.2 边界情况
 
 | ID | 场景 | 期望行为 |
 |----|------|---------|
-| BC-001 | 网络中断时提交表单 | 显示错误提示，保留表单数据 |
-| BC-002 | 并发修改同一资源 | 后提交者提示数据已更新 |
+| BC-001 | .vic-sdd已存在时执行vic init | 提示已存在，不覆盖 |
+| BC-002 | vic rt缺少必需参数 | 提示参数错误 |
+| BC-003 | 在非项目目录执行vic命令 | 提示找不到项目 |
 
 ---
 
@@ -151,14 +160,14 @@
 
 ---
 
-## 6. Phase 规划
+## 5. Phase 规划
 
 ### Phase 1: MVP (最小可行产品)
 
-**目标**: [核心价值交付]
+**目标**: CLI核心命令完成，基本流程可运行
 **边界**: 
-- 包含: [功能列表]
-- 不包含: [功能列表]
+- 包含: vic init, vic status, vic record (tech/risk), vic spec init
+- 不包含: vic check代码对齐 (Phase 2)
 
 **完成条件**:
 - [ ] 所有 Phase 1 验收标准通过
@@ -167,21 +176,24 @@
 
 | 功能 | 验收标准 | 负责人 |
 |------|---------|--------|
-| F-001 | AC-001, AC-002 | Agent-A |
-| F-002 | AC-003, AC-004 | Agent-A |
+| F-001 | AC-001, AC-002 | @sisyphus |
+| F-002 | AC-003, AC-004 | @sisyphus |
+| F-003 | AC-005 | @sisyphus |
+| F-004 | AC-006 | @sisyphus |
 
 ---
 
 ### Phase 2: 扩展功能
 
-**目标**: [扩展价值]
+**目标**: 完善SPEC管理，增强质量检查
 **边界**:
-- 包含: [功能列表]
-- 不包含: [功能列表]
+- 包含: vic spec gate (0-3), vic check, vic validate
+- 不包含: 多用户支持
 
 | 功能 | 验收标准 | 负责人 |
 |------|---------|--------|
-| F-003 | AC-005, AC-006 | Agent-B |
+| F-005 | TBD | @sisyphus |
+| F-006 | TBD | @sisyphus |
 
 ---
 

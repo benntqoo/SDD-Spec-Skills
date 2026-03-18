@@ -523,8 +523,8 @@ redis-cli keys "lock:*"
 # View agent registry
 cat .vic-sdd/agents.yaml
 
-# Check for conflicts
-python skills-base/vibe-integrity/validate-vibe-integrity.py --check-conflicts
+# Check for conflicts (use vic validate instead)
+vic validate
 
 # View decision history
 cat .vic-sdd/decisions.yaml

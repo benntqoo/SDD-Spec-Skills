@@ -56,7 +56,7 @@ your-project/
 ## 集成到新项目
 
 1. 复制 `.pre-commit-config.yaml` 到新项目
-2. 复制 `skills-base/` 目录 (或修改 hook 路径)
+2. 复制 `skills/` 目录 (或修改 hook 路径)
 3. 运行 `pre-commit install`
 
 ## 自定义跳过

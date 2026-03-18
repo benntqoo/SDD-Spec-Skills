@@ -1,5 +1,7 @@
 # Multi-Agent Collaboration Implementation Summary
 
+> ⚠️ **注意**: 本文档记录的是旧版实现。当前系统已重构，Skills已统一放置在 `skills/` 目录下。
+
 ## Overview
 Successfully implemented comprehensive multi-agent collaboration features for Vibe Integrity system based on the analysis of get-shit-done project and user requirements.
 

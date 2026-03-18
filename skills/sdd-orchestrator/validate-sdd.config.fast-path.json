@@ -1,0 +1,16 @@
+{
+  "root_path": ".",
+  "skills_paths": ["./skills"],
+  "recursive_search": false,
+  "fast_path": true,
+  "fast_path_skips": [
+    "spec-traceability",
+    "spec-contract-diff"
+  ],
+  "fast_path_triggers": {
+    "max_file_changes": 3,
+    "max_complexity": 3,
+    "allowed_types": ["config", "docs", "fix"]
+  },
+  "strict_mode": false
+}

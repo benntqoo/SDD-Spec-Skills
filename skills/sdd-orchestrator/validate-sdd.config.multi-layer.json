@@ -1,0 +1,9 @@
+{
+  "root_path": "D:/Code/aaa",
+  "skills_paths": [
+    "D:/Code/aaa/skills",
+    "D:/Shared/skills",
+    "D:/ToolA/profiles/default/skills"
+  ],
+  "recursive_search": true
+}

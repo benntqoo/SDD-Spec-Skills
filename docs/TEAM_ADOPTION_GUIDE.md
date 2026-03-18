@@ -67,7 +67,7 @@
 ```bash
 #!/bin/bash
 # .git/hooks/pre-commit
-python skills-base/vibe-integrity/validate-vibe-integrity.py
+python skills/vibe-integrity/validate-vibe-integrity.py
 ```
 
 ### Git Attributes for .vic-sdd Files
@@ -107,5 +107,4 @@ Track these metrics to gauge adoption and effectiveness:
 
 ## References
 - Entire.io design principles: https://entire.io/
-- Vibe Integrity documentation: skills-base/vibe-integrity/README.md
-- Validation script: skills-base/vibe-integrity/validate-vibe-integrity.py
+- VIC CLI documentation: docs/VIC-CLI-GUIDE.md
