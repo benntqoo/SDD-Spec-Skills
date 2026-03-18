@@ -187,7 +187,7 @@ class FileLock:
 
 **Usage:**
 ```python
-with FileLock(".vibe-integrity/tech-records.yaml"):
+with FileLock(".vic-sdd/tech-records.yaml"):
     # Safe to edit
     writer.update_tech_record(...)
 ```
@@ -226,7 +226,7 @@ class RedisLock:
 
 ### Step 3: Create Decision Registry
 
-**File:** `.vibe-integrity/decisions.yaml`
+**File:** `.vic-sdd/decisions.yaml`
 
 ```yaml
 decisions:
@@ -521,13 +521,13 @@ def test_consensus_building():
 redis-cli keys "lock:*"
 
 # View agent registry
-cat .vibe-integrity/agents.yaml
+cat .vic-sdd/agents.yaml
 
 # Check for conflicts
 python skills-base/vibe-integrity/validate-vibe-integrity.py --check-conflicts
 
 # View decision history
-cat .vibe-integrity/decisions.yaml
+cat .vic-sdd/decisions.yaml
 ```
 
 ## Troubleshooting

@@ -1,37 +1,48 @@
-# Vibe Integrity
+# VIBE-SDD
 
 [English](./README.md)
 
-Vibe Integrity 是专为 AI 辅助开发设计的 **AI 项目记忆与安全系统**。 它可以防止 AI 虚假声称完成,并提供结构化的项目知识供 AI 快速理解。
+VIBE-SDD 是一个结合了结构化 SDD (Spec-Driven Development) 与灵活 Vibe Coding 的**Vibe 驱动软件开发系统**。它为 AI 辅助开发提供了完整的流程，包含规范的检查点和文档管理。
 
 ## 概述
 
-Vibe Integrity 解决了 AI 辅助开发中的两个关键问题：
+VIBE-SDD 解决了 AI 辅助开发中的三个关键问题：
 
-1. **完成守卫** - 检测 AI 是否虚假声称工作已完成
-2. **架构记忆** - 结构化的项目知识供 AI 快速理解
+1. **规范** - 结构化的需求和架构文档
+2. **门禁** - 推进前的质量检查点
+3. **记忆** - 项目知识供 AI 快速理解
 
 ## 快速开始
 
 ```bash
 # 初始化项目
-vic init --name "My Project" --tech "Node.js,Vue,PostgreSQL"
+vic init --name "My Project" --tech "React,Node,PostgreSQL"
+
+# 初始化 SPEC 文档
+vic spec init --name "My Project"
 
 # 记录技术决策
 vic rt --id DB-001 --title "Use PostgreSQL" --decision "Primary database" --reason "Need ACID"
 
+# 查看 SPEC 状态
+vic spec status
+
+# 运行 Gate 检查
+vic spec gate 0  # 需求完整性
+vic spec gate 1  # 架构完整性
+
 # 验证
 vic validate
-
-# 查看状态
-vic status
 ```
 
 ## 命令
 
 | 命令 | 别名 | 描述 |
 |------|------|------|
-| `vic init` | - | 初始化 .vibe-integrity/ |
+| `vic init` | - | 初始化 .vic-sdd/ |
+| `vic spec init` | - | 初始化 SPEC 文档 |
+| `vic spec status` | - | 查看 SPEC 状态 |
+| `vic spec gate [0-3]` | - | 运行 Gate 检查 |
 | `vic rt` | `record-tech` | 记录技术决策 |
 | `vic rr` | `record-risk` | 记录风险 |
 | `vic rd` | `record-dep` | 记录依赖 |
@@ -43,107 +54,118 @@ vic status
 | `vic export` | - | 导出数据 |
 | `vic import` | - | 导入数据 |
 
-完整文档：[cmd/vic/README_cn.md](./cmd/vic/README_cn.md)
+完整文档：[cmd/vic/README.md](./cmd/vic/README.md)
+
+## 开发流程
+
+```
+定图纸 (需求)              打地基 (架构)              立规矩 (实现)
+    │                         │                        │
+vibe-think            vibe-architect            vibe-develop
+    │                         │                        │
+    ▼                         ▼                        ▼
+SPEC-REQUIREMENTS.md ─▶ SPEC-ARCHITECTURE.md ─▶ 实现代码
+    │                         │                        │
+    ▼                         ▼                        ▼
+   Gate 0                  Gate 1                  Gate 2 + 3
+(需求完整)              (架构完整)              (代码 + 测试)
+                                                        │
+                                                        ▼
+                                              收敛到 PRD/ARCH/PROJECT
+```
 
 ## 目录结构
 
 ```
-D:\Code\aaa\
+project/
 ├── cmd/
 │   └── vic/                    # CLI 工具
-│       ├── vic                 # 主程序
+│       ├── vic                  # 主程序
 │       ├── README.md           # 英文文档
-│       └── README_cn.md        # 中文文档
+│       └── *.py                # 脚本
 │
 ├── skills-base/                # Skills 定义
-│   ├── vibe-integrity/         # 核心记忆系统
-│   ├── vibe-think/             # 思考澄清
-│   └── vibe-debug/             # 调试方法论
-│
-├── .vibe-integrity/            # 项目数据
-│   ├── project.yaml
-│   ├── tech-records.yaml
-│   ├── risk-zones.yaml
-│   ├── dependency-graph.yaml
-│   ├── events.yaml
-│   └── state.yaml
+│   ├── vibe-think/             # 需求澄清
+│   ├── vibe-architect/          # 架构设计
+│   ├── vibe-develop/           # 开发流程
+│   ├── vibe-integrity/         # 记忆与验证
+│   └── vibe-debug/             # 调试
 │
 ├── docs/                       # 设计文档
+│   └── *.md
 │
-├── .pre-commit-config.yaml
-└── requirements.txt
+└── .vic-sdd/                   # 项目记忆与规范
+    ├── SPEC-REQUIREMENTS.md    # 需求规范
+    ├── SPEC-ARCHITECTURE.md    # 架构规范
+    ├── PROJECT.md              # 项目状态
+    ├── status/
+    │   ├── events.yaml          # 事件历史
+    │   └── state.yaml          # 当前状态
+    ├── tech/
+    │   └── tech-records.yaml   # 技术决策
+    ├── risk-zones.yaml        # 风险记录
+    ├── project.yaml            # AI 快速参考
+    └── dependency-graph.yaml   # 模块依赖
 ```
 
-## 核心文件
+## 核心理念
 
-| 文件 | 目的 |
-|------|------|
-| `project.yaml` | 项目元信息,技术栈 |
-| `tech-records.yaml` | 技术决策记录 |
-| `risk-zones.yaml` | 高风险区域 |
-| `dependency-graph.yaml` | 模块依赖关系 |
-| `events.yaml` | 事件历史 (追加) |
-| `state.yaml` | 当前状态 (自动生成) |
+### 定图纸 (需求)
+- 定义用户故事和验收标准
+- 规划开发阶段
+- 创建 SPEC-REQUIREMENTS.md
+
+### 打地基 (架构)
+- 评估技术选型
+- 设计系统架构
+- 创建 SPEC-ARCHITECTURE.md
+
+### 立规矩 (实现)
+- 小步迭代
+- 门禁检查推进
+- 收敛到 PRD/ARCH/PROJECT
 
 ## AI 快速开始
 
-当 AI 开始在这个项目上工作时,请按此顺序阅读:
+当 AI 在这个项目上开始工作时，请按以下顺序阅读：
 
 ```
-1. .vibe-integrity/project.yaml    → 项目状态,技术栈
-2. .vibe-integrity/risk-zones.yaml → 高风险区域
-3. .vibe-integrity/tech-records.yaml → 理解系统为何如此设计
+1. .vic-sdd/PROJECT.md                → 项目状态、里程碑
+2. .vic-sdd/SPEC-REQUIREMENTS.md      → 需求、验收标准
+3. .vic-sdd/SPEC-ARCHITECTURE.md      → 架构、技术栈
+4. .vic-sdd/risk-zones.yaml           → 高风险区域
 ```
 
-**结果**: AI 能在大约 15 秒内理解项目。
+**结果**: AI 能在约 15 秒内理解项目上下文。
 
 ## 典型工作流
 
-### 开始新项目
-```bash
-vic init --name "My App" --tech "React,Node,PostgreSQL"
-```
-
-### 做技术决策时
-```bash
-vic rt --id FE-001 --title "Use React Query" --decision "Data fetching" --reason "Caching"
-```
-
-### 发现风险时
-```bash
-vic rr --id RISK-001 --area payment --desc "No idempotency key" --impact high
-```
-
-### AI 说"完成了"时
-```bash
-vic check
-```
-
-### 提交代码前
-```bash
-vic validate
-```
-
-### 备份/迁移项目记忆
-```bash
-vic export -o backup.json
-# 在新项目中
-vic import backup.json
-```
+| 场景 | 命令 |
+|------|------|
+| 开始新项目 | `vic init` |
+| 初始化 SPEC | `vic spec init` |
+| 做技术决策 | `vic rt` |
+| 发现风险 | `vic rr` |
+| 推进前检查 | `vic spec gate [0-3]` |
+| AI 说"完成了" | `vic check` |
+| 提交前验证 | `vic validate` |
+| 备份记忆 | `vic export` |
 
 ## 相关 Skills
 
 | Skill | 用途 |
-|------|------|
-| `vibe-integrity` | 项目记忆与验证 |
-| `vibe-think` | 需求澄清、增强提问 |
-| `vibe-debug` | 系统性调试方法论 |
+|-------|------|
+| `vibe-think` | 需求澄清 |
+| `vibe-architect` | 架构设计 |
+| `vibe-develop` | 开发流程 |
+| `vibe-integrity` | 记忆与验证 |
+| `vibe-debug` | 系统性调试 |
 
 ## 安装
 
 ```bash
 # 依赖
-pip install pyyaml filelock
+pip install pyyaml
 
 # Linux/macOS - 添加到 PATH
 chmod +x cmd/vic/vic
@@ -155,4 +177,4 @@ Set-Alias vic "python D:\Code\aaa\cmd\vic\vic"
 
 ## 许可证
 
-MIT License
+MIT License. See [LICENSE](./LICENSE).

@@ -10,7 +10,7 @@ Successfully implemented comprehensive multi-agent collaboration features for Vi
 - **Features**:
   - Cross-platform file locking (Unix fcntl, Windows msvcrt)
   - 30-second timeout with stale lock detection
-  - Lock files created in `.vibe-integrity/locks/`
+  - Lock files created in `.vic-sdd/locks/`
   - Prevents concurrent writes to same file
   - Automatic cleanup of stale locks
 

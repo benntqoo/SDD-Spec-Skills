@@ -1,52 +1,142 @@
 ---
 name: vibe-integrity
-description: Use when working on a project or need to record/retrieve architecture decisions, risks, and verify code alignment.
+description: Use when working on a project, recording technical decisions, identifying risks, verifying code alignment, or managing SPEC workflow.
 ---
 
 # Vibe Integrity
 
-统一的 AI 项目记忆与安全系统。
+AI Project Memory & Safety System - prevents false completion claims and provides structured project knowledge.
 
-## 快速命令
+---
+
+## Quick Commands
 
 ```bash
-# 初始化项目
-vic init --name "My Project" --tech "Node.js,Vue,PostgreSQL"
+# Initialize project
+vic init --name "My Project" --tech "React,Node,PostgreSQL"
 
-# 记录技术决策
+# Record technical decision
 vic rt --id DB-001 --title "Use PostgreSQL" --decision "Primary database" --reason "Need ACID"
 
-# 记录风险
+# Record risk
 vic rr --id RISK-001 --area auth --desc "JWT handling issue"
 
-# 检查代码对齐
+# SPEC commands
+vic spec init --name "My Project"
+vic spec status
+vic spec gate 0  # Requirements
+vic spec gate 1  # Architecture
+
+# Validate
 vic check
-
-# 完整验证
 vic validate
-
-# 查看状态
 vic status
 ```
 
-## 何时用什么
+---
 
-| 场景 | 命令 |
-|------|------|
-| 开始新项目 | `vic init` |
-| 做了一个技术决策 | `vic rt` |
-| 发现一个风险 | `vic rr` |
-| AI 说"完成了" | `vic check` |
-| 提交前验证 | `vic validate` |
-| 备份项目记忆 | `vic export` |
+## When to Use
 
-## 相关 Skills
+| Scenario | Command |
+|----------|---------|
+| Start new project | `vic init` |
+| Make technical decision | `vic rt` |
+| Identify risk | `vic rr` |
+| Record dependency | `vic rd` |
+| AI claims "done" | `vic check` |
+| Before commit | `vic validate` |
+| Check SPEC status | `vic spec status` |
+| Run Gate checks | `vic spec gate [0-3]` |
+| Backup memory | `vic export` |
 
-| Skill | 用途 |
-|------|------|
-| `vibe-think` | 需求澄清、增强提问 |
-| `vibe-debug` | 系统性调试方法论 |
+---
 
-## 完整文档
+## Quick Reference
 
-详见 [cmd/vic/README.md](../../cmd/vic/README.md)
+| Command | Alias | Purpose |
+|---------|-------|---------|
+| `vic init` | - | Initialize .vic-sdd/ |
+| `vic spec init` | - | Initialize SPEC docs |
+| `vic rt` | `record-tech` | Record decision |
+| `vic rr` | `record-risk` | Record risk |
+| `vic rd` | `record-dep` | Record dependency |
+| `vic check` | - | Code alignment |
+| `vic validate` | - | Full validation |
+| `vic spec gate [0-3]` | - | Gate checks |
+| `vic status` | - | Project status |
+| `vic search` | - | Search records |
+| `vic history` | - | Event history |
+| `vic export` | - | Export data |
+| `vic import` | - | Import data |
+
+---
+
+## Gate Reference
+
+| Gate | Name | Checks |
+|------|------|--------|
+| Gate 0 | Requirements | User stories, acceptance criteria, phase plan |
+| Gate 1 | Architecture | Tech stack, data model, API design |
+| Gate 2 | Code Alignment | Code matches SPEC-ARCHITECTURE.md |
+| Gate 3 | Test Coverage | Acceptance criteria covered |
+
+---
+
+## Directory Structure
+
+```
+.vic-sdd/
+├── SPEC-REQUIREMENTS.md    # Requirements spec
+├── SPEC-ARCHITECTURE.md    # Architecture spec
+├── PROJECT.md              # Project status
+├── status/
+│   ├── events.yaml         # Event history
+│   └── state.yaml          # Current state
+├── tech/
+│   └── tech-records.yaml  # Technical decisions
+├── risk-zones.yaml        # Risk records
+├── project.yaml           # AI quick reference
+└── dependency-graph.yaml  # Module dependencies
+```
+
+---
+
+## Related Skills
+
+| Skill | Purpose |
+|-------|---------|
+| `vibe-think` | Requirements clarification → SPEC-REQUIREMENTS.md |
+| `vibe-architect` | Tech selection → SPEC-ARCHITECTURE.md |
+| `vibe-develop` | Implementation, Gate checks |
+| `vibe-debug` | Systematic debugging |
+
+---
+
+## Common Mistakes
+
+| Mistake | Fix |
+|---------|-----|
+| Skipping `vic check` before commit | Always validate code alignment |
+| Recording vague decisions | Include specific reason and impact |
+| Not updating risk status | Use `vic rr --status resolved` when fixed |
+| Forgetting SPEC updates | Update SPEC before Gate checks |
+| Ignoring Gate failures | Fix issues before proceeding |
+
+---
+
+## Quick Checklist
+
+Before claiming completion:
+- [ ] Ran `vic check`?
+- [ ] All tech decisions recorded?
+- [ ] New risks identified?
+
+Before Gate progression:
+- [ ] Gate 0: Requirements complete?
+- [ ] Gate 1: Architecture complete?
+- [ ] Gate 2: Code aligns with SPEC?
+- [ ] Gate 3: Tests cover acceptance criteria?
+
+Before commit:
+- [ ] `vic validate` passes?
+- [ ] `vic export` for backup?

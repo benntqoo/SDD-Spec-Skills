@@ -36,8 +36,8 @@ The system relies on Git for collaboration with these mechanisms:
 
 #### .gitattributes Configuration
 ```gitattributes
-.vibe-integrity/*.yaml merge=union
-.vibe-integrity/index/*.yaml merge=union
+.vic-sdd/*.yaml merge=union
+.vic-sdd/index/*.yaml merge=union
 ```
 
 **How it works**:
@@ -47,7 +47,7 @@ The system relies on Git for collaboration with these mechanisms:
 
 #### Branching Strategy
 - Feature branches for changes
-- Pull requests for reviewing .vibe-integrity/ changes
+- Pull requests for reviewing .vic-sdd/ changes
 - Squash merge to keep history clean
 
 #### Potential Issues:
@@ -179,11 +179,11 @@ If running multiple agent instances:
 ### Enhanced .gitattributes
 ```gitattributes
 # Union merge for YAML files (keeps both versions)
-.vibe-integrity/*.yaml merge=union
-.vibe-integrity/index/*.yaml merge=union
+.vic-sdd/*.yaml merge=union
+.vic-sdd/index/*.yaml merge=union
 
 # But use custom merge driver for specific files
-.vibe-integrity/tech-records.yaml merge=vibe-integrity-merge
+.vic-sdd/tech-records.yaml merge=vibe-integrity-merge
 ```
 
 ### Custom Merge Driver

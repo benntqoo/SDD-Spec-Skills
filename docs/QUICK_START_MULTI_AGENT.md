@@ -88,7 +88,7 @@
 
 3. **Create agent registry:**
    ```yaml
-   # .vibe-integrity/agents.yaml
+   # .vic-sdd/agents.yaml
    agents:
      - id: design-agent-001
        session: ses_abc123
@@ -165,7 +165,7 @@
 - [ ] Add agent_id to all YAML records
 - [ ] Implement basic file locking
 - [ ] Add duplicate ID detection
-- [ ] Create `.vibe-integrity/decisions.yaml`
+- [ ] Create `.vic-sdd/decisions.yaml`
 
 ### Phase 2: Advanced (Next Month)
 - [ ] Deploy Redis (if needed)

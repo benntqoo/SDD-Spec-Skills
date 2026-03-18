@@ -1,0 +1,122 @@
+version: 1.0.0
+created_at: 2026-03-17 00:00:00+00:00
+description: Append-only event log for vibe integrity
+events:
+- id: evt-example-001
+  timestamp: 2026-03-17 10:00:00+00:00
+  agent_id: agent-example
+  session_id: ses-example
+  type: decision_made
+  data:
+    category: database
+    id: DB-EXAMPLE
+    title: Example Decision
+    decision: Use SQLite for development
+    reason: Fast iteration during MVP
+    impact: low
+  metadata:
+    branch: main
+    verified: false
+- id: evt-example-002
+  timestamp: 2026-03-17 10:05:00+00:00
+  agent_id: agent-example
+  session_id: ses-example
+  type: risk_identified
+  data:
+    category: architecture
+    id: RISK-EXAMPLE
+    area: auth-service
+    description: Example risk - direct DB access
+    impact: medium
+  metadata:
+    branch: main
+- id: evt-aea643ce6e3a
+  timestamp: '2026-03-17T09:34:04.502104'
+  agent_id: agent-85cf007f
+  session_id: ses-9067f1027e9e
+  type: yaml_add_record
+  data:
+    target_file: tech-records.yaml
+    data:
+      id: TEST-001
+      title: Test record
+- id: evt-80246e439133
+  timestamp: '2026-03-17T15:36:39.891994'
+  agent_id: agent-53b017a8
+  session_id: ses-9abbee701ae5
+  type: decision_made
+  data:
+    id: DB-002
+    date: '2026-03-17'
+    category: architecture
+    title: Test Export
+    decision: Use PostgreSQL
+    reason: Need ACID transactions
+    impact: medium
+    status: completed
+- id: evt-example-001
+  timestamp: '2026-03-17T10:00:00+00:00'
+  agent_id: agent-example
+  session_id: ses-example
+  type: decision_made
+  data:
+    category: database
+    id: DB-EXAMPLE
+    title: Example Decision
+    decision: Use SQLite for development
+    reason: Fast iteration during MVP
+    impact: low
+  metadata:
+    branch: main
+    verified: false
+- id: evt-example-002
+  timestamp: '2026-03-17T10:05:00+00:00'
+  agent_id: agent-example
+  session_id: ses-example
+  type: risk_identified
+  data:
+    category: architecture
+    id: RISK-EXAMPLE
+    area: auth-service
+    description: Example risk - direct DB access
+    impact: medium
+  metadata:
+    branch: main
+- id: evt-aea643ce6e3a
+  timestamp: '2026-03-17T09:34:04.502104'
+  agent_id: agent-85cf007f
+  session_id: ses-9067f1027e9e
+  type: yaml_add_record
+  data:
+    target_file: tech-records.yaml
+    data:
+      id: TEST-001
+      title: Test record
+- id: evt-80246e439133
+  timestamp: '2026-03-17T15:36:39.891994'
+  agent_id: agent-53b017a8
+  session_id: ses-9abbee701ae5
+  type: decision_made
+  data:
+    id: DB-002
+    date: '2026-03-17'
+    category: architecture
+    title: Test Export
+    decision: Use PostgreSQL
+    reason: Need ACID transactions
+    impact: medium
+    status: completed
+- id: evt-616431a7f117
+  timestamp: '2026-03-17T15:44:11.805877'
+  agent_id: agent-17b5eb09
+  session_id: ses-b21fc16e6abe
+  type: decision_made
+  data:
+    id: TEST-CLI-001
+    date: '2026-03-17'
+    category: architecture
+    title: CLI Test Decision
+    decision: Test decision
+    reason: Verification test
+    impact: medium
+    status: completed

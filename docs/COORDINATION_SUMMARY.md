@@ -44,7 +44,7 @@
 1. Add agent_id and session_id to all records
 2. Run validation before commit
 3. Use custom merge driver for YAML files
-4. Track decisions in `.vibe-integrity/decisions.yaml`
+4. Track decisions in `.vic-sdd/decisions.yaml`
 
 **Pros:** Simple, no new infrastructure, familiar workflow
 **Cons:** No real-time features, manual conflict resolution
@@ -145,7 +145,7 @@ def check_for_conflicts(new_record, existing):
 
 ### Step 4: Decision Registry (10 minutes)
 
-Create `.vibe-integrity/decisions.yaml`:
+Create `.vic-sdd/decisions.yaml`:
 ```yaml
 decisions:
   - id: DEC-001

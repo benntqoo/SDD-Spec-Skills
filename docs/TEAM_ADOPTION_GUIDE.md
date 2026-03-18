@@ -8,9 +8,9 @@
 - Use descriptive branch names: `feature/`, `fix/`, `refactor/`
 - Squash and merge pull requests to keep history clean
 
-### 2. .vibe-integrity File Management
-- Treat .vibe-integrity files as regular code - review them in PRs
-- Avoid editing the same .vibe-integrity files simultaneously when possible
+### 2. .vic-sdd File Management
+- Treat .vic-sdd files as regular code - review them in PRs
+- Avoid editing the same .vic-sdd files simultaneously when possible
 - If simultaneous edits are necessary, communicate with team members
 - Use the validation script regularly to catch inconsistencies early
 
@@ -21,7 +21,7 @@
 - Update documentation when significant architectural decisions are made
 
 ### 4. Conflict Resolution
-- When merge conflicts occur in .vibe-integrity files:
+- When merge conflicts occur in .vic-sdd files:
   1. Understand the intent of both changes
   2. Preserve all valid records from both versions
   3. Ensure no duplicate IDs are introduced
@@ -70,11 +70,11 @@
 python skills-base/vibe-integrity/validate-vibe-integrity.py
 ```
 
-### Git Attributes for .vibe-integrity Files
+### Git Attributes for .vic-sdd Files
 Create `.gitattributes` with:
 ```
-.vibe-integrity/*.yaml merge=union
-.vibe-integrity/index/*.yaml merge=union
+.vic-sdd/*.yaml merge=union
+.vic-sdd/index/*.yaml merge=union
 ```
 This helps reduce merge conflicts by taking both versions when conflicts occur.
 
@@ -99,7 +99,7 @@ This helps reduce merge conflicts by taking both versions when conflicts occur.
 ## Measuring Success
 
 Track these metrics to gauge adoption and effectiveness:
-- Reduction in merge conflicts involving .vibe-integrity files
+- Reduction in merge conflicts involving .vic-sdd files
 - Frequency of validation script runs (should be pre-commit)
 - Number of records archived per grooming cycle
 - Team satisfaction with project memory usability

@@ -1,37 +1,48 @@
-# Vibe Integrity
+# VIBE-SDD
 
 [中文说明](./README.zh-CN.md)
 
-Vibe Integrity is an **AI Project Memory & Safety System** designed for AI-assisted development. It prevents false completion claims and provides structured project knowledge for rapid AI understanding.
+VIBE-SDD is a **Vibe-Driven Software Development System** combining structured SDD (Spec-Driven Development) with flexible Vibe Coding. It provides a complete workflow for AI-assisted development with proper gates and documentation.
 
 ## Overview
 
-Vibe Integrity solves two critical problems in AI-assisted development:
+VIBE-SDD solves three critical problems in AI-assisted development:
 
-1. **Completion Guard** - Detects when AI falsely claims work is complete
-2. **Architecture Memory** - Structured project knowledge for AI quick understanding
+1. **Specification** - Structured requirements and architecture documentation
+2. **Gates** - Quality checkpoints before progression
+3. **Memory** - Project knowledge for AI quick understanding
 
 ## Quick Start
 
 ```bash
 # Initialize project
-vic init --name "My Project" --tech "Node.js,Vue,PostgreSQL"
+vic init --name "My Project" --tech "React,Node,PostgreSQL"
+
+# Initialize SPEC documents
+vic spec init --name "My Project"
 
 # Record a technical decision
 vic rt --id DB-001 --title "Use PostgreSQL" --decision "Primary database" --reason "Need ACID"
 
+# Check SPEC status
+vic spec status
+
+# Run Gate checks
+vic spec gate 0  # Requirements
+vic spec gate 1  # Architecture
+
 # Validate
 vic validate
-
-# Check status
-vic status
 ```
 
 ## Commands
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `vic init` | - | Initialize .vibe-integrity/ |
+| `vic init` | - | Initialize .vic-sdd/ |
+| `vic spec init` | - | Initialize SPEC documents |
+| `vic spec status` | - | Show SPEC status |
+| `vic spec gate [0-3]` | - | Run Gate checks |
 | `vic rt` | `record-tech` | Record technical decision |
 | `vic rr` | `record-risk` | Record risk |
 | `vic rd` | `record-dep` | Record dependency |
@@ -45,67 +56,97 @@ vic status
 
 See [cmd/vic/README.md](./cmd/vic/README.md) for full documentation.
 
+## Development Workflow
+
+```
+定图纸 (Requirements)     打地基 (Architecture)    立规矩 (Implementation)
+        │                          │                         │
+   vibe-think              vibe-architect            vibe-develop
+        │                          │                         │
+        ▼                          ▼                         ▼
+SPEC-REQUIREMENTS.md  ──▶  SPEC-ARCHITECTURE.md  ──▶  Implementation
+        │                          │                         │
+        ▼                          ▼                         ▼
+   Gate 0                    Gate 1                  Gate 2 + 3
+(Requirements)          (Architecture)           (Code + Tests)
+                                                        │
+                                                        ▼
+                                              Merge to PRD/ARCH/PROJECT
+```
+
 ## Directory Structure
 
 ```
 project/
 ├── cmd/
 │   └── vic/                    # CLI tool
-│       ├── vic                 # Main CLI
-│       ├── README.md           # English docs
-│       ├── README_cn.md        # Chinese docs
-│       └── *.py                # Scripts
+│       ├── vic                  # Main CLI
+│       ├── README.md            # English docs
+│       └── *.py                 # Scripts
 │
 ├── skills-base/                # Skills definitions
-│   ├── vibe-integrity/SKILL.md
-│   ├── vibe-think/SKILL.md
-│   └── vibe-debug/SKILL.md
+│   ├── vibe-think/            # Requirements clarification
+│   ├── vibe-architect/        # Architecture design
+│   ├── vibe-develop/          # Implementation workflow
+│   ├── vibe-integrity/         # Memory and validation
+│   └── vibe-debug/            # Debugging
 │
-├── docs/                       # Design docs
+├── docs/                      # Design docs
 │   └── *.md
 │
-├── .vibe-integrity/           # Project memory
-│   ├── project.yaml
-│   ├── tech-records.yaml
-│   ├── risk-zones.yaml
-│   ├── dependency-graph.yaml
-│   ├── events.yaml
-│   └── state.yaml
-│
-├── .pre-commit-config.yaml
-└── requirements.txt
+└── .vic-sdd/                  # Project memory & specs
+    ├── SPEC-REQUIREMENTS.md    # Requirements spec
+    ├── SPEC-ARCHITECTURE.md    # Architecture spec
+    ├── PROJECT.md             # Project status
+    ├── status/
+    │   ├── events.yaml         # Event history
+    │   └── state.yaml         # Current state
+    ├── tech/
+    │   └── tech-records.yaml  # Technical decisions
+    ├── risk-zones.yaml        # Risk records
+    ├── project.yaml           # AI quick reference
+    └── dependency-graph.yaml  # Module dependencies
 ```
 
-## Core Files
+## Core Concepts
 
-| File | Purpose |
-|------|---------|
-| `project.yaml` | Project metadata, tech stack |
-| `tech-records.yaml` | Technical decisions |
-| `risk-zones.yaml` | High-risk areas |
-| `dependency-graph.yaml` | Module dependencies |
-| `events.yaml` | Event history (append-only) |
-| `state.yaml` | Current state (generated) |
+### 定图纸 (Requirements)
+- Define user stories and acceptance criteria
+- Plan development phases
+- Create SPEC-REQUIREMENTS.md
+
+### 打地基 (Architecture)
+- Evaluate technology options
+- Design system architecture
+- Create SPEC-ARCHITECTURE.md
+
+### 立规矩 (Implementation)
+- Small iteration cycles
+- Gate checks before progression
+- Merge to PRD/ARCH/PROJECT
 
 ## AI Quick Start
 
 When AI starts on this project, read in order:
 
 ```
-1. .vibe-integrity/project.yaml    → Project status, tech stack
-2. .vibe-integrity/risk-zones.yaml → High-risk areas
-3. .vibe-integrity/tech-records.yaml → Why system is designed this way
+1. .vic-sdd/PROJECT.md          → Project status, milestones
+2. .vic-sdd/SPEC-REQUIREMENTS.md → Requirements, acceptance criteria
+3. .vic-sdd/SPEC-ARCHITECTURE.md → Architecture, tech stack
+4. .vic-sdd/risk-zones.yaml    → High-risk areas
 ```
 
-**Result**: AI understands project in ~15 seconds.
+**Result**: AI understands project context in ~15 seconds.
 
 ## Workflow
 
 | Scenario | Command |
 |----------|---------|
 | Start new project | `vic init` |
+| Initialize SPEC | `vic spec init` |
 | Made a decision | `vic rt` |
 | Found a risk | `vic rr` |
+| Before progression | `vic spec gate [0-3]` |
 | AI claims "done" | `vic check` |
 | Before commit | `vic validate` |
 | Backup memory | `vic export` |
@@ -114,15 +155,17 @@ When AI starts on this project, read in order:
 
 | Skill | Purpose |
 |-------|---------|
-| `vibe-integrity` | Core CLI and validation |
-| `vibe-think` | Requirement clarification |
+| `vibe-think` | Requirements clarification |
+| `vibe-architect` | Architecture design |
+| `vibe-develop` | Implementation workflow |
+| `vibe-integrity` | Memory and validation |
 | `vibe-debug` | Systematic debugging |
 
 ## Installation
 
 ```bash
 # Dependencies
-pip install pyyaml filelock pre-commit
+pip install pyyaml
 
 # Linux/macOS
 chmod +x cmd/vic/vic
@@ -130,9 +173,6 @@ sudo ln -s $(pwd)/cmd/vic/vic /usr/local/bin/vic
 
 # Windows PowerShell
 Set-Alias vic "python D:\path\to\cmd\vic\vic"
-
-# Install pre-commit hooks
-pre-commit install
 ```
 
 ## License

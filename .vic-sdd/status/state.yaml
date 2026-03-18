@@ -1,0 +1,135 @@
+state:
+    last_folded: 9 events processed
+    active_decisions: 2
+    active_risks: 0
+    tech_records:
+        - id: DB-001
+          title: 选择 SQLite 作为 MVP 数据库
+          decision: |
+            使用 SQLite 作为开发数据库
+            - 零配置，易于启动
+            - 文件存储，无需数据库服务
+            - 适合 MVP 快速迭代
+          category: database
+          reason: MVP 阶段优先速度，SQLite 足够
+          impact: low
+          status: completed
+          files: []
+          created_at: ""
+          updated_at: ""
+        - id: DB-002
+          title: Test Export
+          decision: Use PostgreSQL
+          category: architecture
+          reason: Need ACID transactions
+          impact: medium
+          status: completed
+          files: []
+          created_at: ""
+          updated_at: ""
+        - id: DB-003
+          title: 计划迁移到 PostgreSQL
+          decision: |
+            迁移到 PostgreSQL
+            - 支持高并发
+            - 更好的事务支持
+            - 适合生产环境
+          category: database
+          reason: ""
+          impact: high
+          status: planned
+          files: []
+          created_at: ""
+          updated_at: ""
+        - id: AUTH-001
+          title: 使用 JWT 进行身份验证
+          decision: |
+            使用 JWT (JSON Web Token)
+            - 无状态，扩展性好
+            - 跨平台支持
+            - 标准协议
+          category: authentication
+          reason: 简单有效，适合 REST API
+          impact: medium
+          status: completed
+          files: []
+          created_at: ""
+          updated_at: ""
+        - id: AUTH-002
+          title: 添加 Refresh Token 机制
+          decision: |
+            添加 refresh token
+            - Access token: 1 小时有效期
+            - Refresh token: 7 天有效期
+            - 定期刷新，保持登录状态
+          category: authentication
+          reason: 平衡安全性和用户体验
+          impact: medium
+          status: completed
+          files: []
+          created_at: ""
+          updated_at: ""
+        - id: ARCH-001
+          title: 采用三层架构
+          decision: |
+            三层架构:
+            - Controller (路由): 处理 HTTP 请求
+            - Service (业务): 业务逻辑
+            - Repository (数据): 数据库操作
+          category: architecture
+          reason: 简单清晰，适合中小项目
+          impact: low
+          status: completed
+          files: []
+          created_at: ""
+          updated_at: ""
+        - id: FE-001
+          title: 选择 Vue 3 + Composition API
+          decision: |
+            使用 Vue 3 + Composition API
+            - 更好的 TypeScript 支持
+            - 逻辑复用更灵活
+            - 更好的性能
+          category: frontend
+          reason: 团队熟悉，生态完善
+          impact: low
+          status: completed
+          files: []
+          created_at: ""
+          updated_at: ""
+        - id: FE-002
+          title: 使用 Pinia 进行状态管理
+          decision: |
+            使用 Pinia
+            - Vue 3 官方推荐
+            - TypeScript 支持好
+            - API 简洁
+          category: frontend
+          reason: Vue 3 生态，集成最佳
+          impact: low
+          status: completed
+          files: []
+          created_at: ""
+          updated_at: ""
+        - id: TEST-001
+          title: Test record
+          decision: ""
+          category: ""
+          reason: ""
+          impact: ""
+          status: ""
+          files: []
+          created_at: ""
+          updated_at: ""
+        - id: TEST-CLI-001
+          title: CLI Test Decision
+          decision: Test decision
+          category: architecture
+          reason: Verification test
+          impact: medium
+          status: completed
+          files: []
+          created_at: ""
+          updated_at: ""
+    risks: []
+    dependencies: []

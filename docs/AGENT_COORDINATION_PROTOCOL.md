@@ -24,8 +24,8 @@ A lightweight coordination protocol for Vibe Integrity agents to work together w
   "type": "interest",
   "agent_id": "design-agent-001",
   "files": [
-    ".vibe-integrity/tech-records.yaml",
-    ".vibe-integrity/dependency-graph.yaml"
+    ".vic-sdd/tech-records.yaml",
+    ".vic-sdd/dependency-graph.yaml"
   ],
   "expected_duration": "5m"
 }
@@ -36,7 +36,7 @@ A lightweight coordination protocol for Vibe Integrity agents to work together w
 {
   "type": "lock_request",
   "agent_id": "design-agent-001",
-  "file": ".vibe-integrity/tech-records.yaml",
+  "file": ".vic-sdd/tech-records.yaml",
   "operation": "append",
   "timeout": 30
 }
@@ -46,7 +46,7 @@ A lightweight coordination protocol for Vibe Integrity agents to work together w
 ```json
 {
   "type": "lock_grant",
-  "file": ".vibe-integrity/tech-records.yaml",
+  "file": ".vic-sdd/tech-records.yaml",
   "granted_to": "design-agent-001",
   "expires_at": "2026-03-13T10:30:30Z",
   "token": "lock-token-xyz"
@@ -74,7 +74,7 @@ A lightweight coordination protocol for Vibe Integrity agents to work together w
   "type": "conflict",
   "conflict_id": "conf-001",
   "agents": ["design-agent-001", "debug-agent-002"],
-  "file": ".vibe-integrity/tech-records.yaml",
+  "file": ".vic-sdd/tech-records.yaml",
   "conflicting_changes": [
     {"agent": "design-agent-001", "change": "Add DB choice"},
     {"agent": "debug-agent-002", "change": "Add risk about DB"}
@@ -307,12 +307,12 @@ class GossipCoordination:
 1. **Git-based primary workflow** (current)
 2. **File locks for concurrent access** (short-term)
 3. **Redis for coordination** (medium-term, optional)
-4. **Agent registry in .vibe-integrity/** (always)
+4. **Agent registry in .vic-sdd/** (always)
 
 ### Agent Registry Format
 
 ```yaml
-# .vibe-integrity/agents.yaml
+# .vic-sdd/agents.yaml
 agents:
   - id: design-agent-001
     session: ses_abc123
