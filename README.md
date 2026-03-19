@@ -106,9 +106,12 @@ project/
 │       ├── spec-architect/      # Freeze requirements into contracts
 │       ├── spec-to-codebase/    # Generate implementation
 │       ├── spec-contract-diff/  # Detect spec drift
-│       ├── spec-driven-test/    # Contract + TDD tests
+│       ├── spec-driven-test/    # Contract verification tests (spec-first)
 │       ├── spec-traceability/   # Story-to-code traceability
 │       └── sdd-release-guard/  # Final release gates
+│
+│   └── TDD Standalone (1):         # Independent red-green-refactor mode
+│       └── test-driven-development/ # Single-module logic (no SPEC needed)
 │
 ├── docs/                      # Design docs
 │   ├── VIC-CLI-GUIDE.md      # CLI操作指南

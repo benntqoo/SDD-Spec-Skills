@@ -106,10 +106,12 @@ project/
 │       ├── spec-architect/      # 将需求凝固为契约
 │       ├── spec-to-codebase/    # 从契约生成代码
 │       ├── spec-contract-diff/  # 检测契约漂移
-│       ├── spec-driven-test/    # 契约测试 + TDD
+│       ├── spec-driven-test/    # 契约验证测试（契约先行）
 │       ├── spec-traceability/   # 故事→契约→代码→测试追溯
 │       └── sdd-release-guard/  # 最终发布门禁
 │
+│   └── TDD 独立 (1):               # 独立的红绿重构模式
+│       └── test-driven-development/ # 单模块逻辑（无需 SPEC）
 ├── docs/                       # 设计文档
 │   ├── VIC-CLI-GUIDE.md       # CLI操作指南
 │   └── *.md
@@ -177,7 +179,9 @@ VIBE-SDD 通过 4 个机制赋予 AI"自知之明"：
 | 初始化 SPEC | `vic spec init` |
 | 做技术决策 | `vic rt` |
 | 发现风险 | `vic rr` |
-| 推进前检查 | `vic spec gate [0-3]` |
+| 推进阶段 | `vic phase advance` |
+| 查看阶段 | `vic phase status` |
+| 通过门禁 | `vic gate pass --gate N` |
 | AI 说"完成了" | `vic check` |
 | 提交前验证 | `vic validate` |
 | 备份记忆 | `vic export` |
