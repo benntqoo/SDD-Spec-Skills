@@ -19,7 +19,7 @@ description: Use when need to run end-to-end tests, browser automation, visual r
 - Smoke testing before release
 
 **NOT use when:**
-- Unit testing (use `spec-test`)
+- Unit testing (use `spec-driven-test`)
 - Code review (use `vibe-debug`)
 - Design discussions (use `vibe-design`)
 
@@ -57,7 +57,7 @@ description: Use when need to run end-to-end tests, browser automation, visual r
 - Test individual functions
 - Fast, isolated
 - High coverage
-- Managed by `spec-test`
+- Managed by `spec-driven-test`
 
 ### 2. Integration Tests
 - Test component interactions
@@ -298,7 +298,7 @@ Before declaring QA complete:
 
 | Skill | Relationship |
 |-------|--------------|
-| `spec-test` | Unit/integration tests |
+| `spec-driven-test` | Unit/integration tests + TDD |
 | `vibe-debug` | Debug failed tests |
 | `vibe-design` | Visual consistency |
 | `sdd-release-guard` | Final QA gate |

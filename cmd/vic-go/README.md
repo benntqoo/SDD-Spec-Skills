@@ -415,7 +415,7 @@ vic qa history
 ```
          E2E      ← Vibe QA
       Integration
-       Unit Tests  ← spec-test
+        Unit Tests  ← spec-driven-test
 ```
 
 ## Integration with Skills
@@ -435,7 +435,7 @@ skill adaptive-planning
 skill vibe-design
 
 # Phase 4: Testing & QA
-skill spec-test      # TDD enforcement
+skill spec-driven-test # TDD enforcement
 skill vibe-debug     # Systematic debugging
 skill vibe-qa        # E2E testing
 ```

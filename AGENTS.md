@@ -330,7 +330,7 @@ vic validate
 | `spec-to-codebase` | SDD: 代码生成 |
 | `spec-contract-diff` | SDD: 代码对齐检查 |
 | `spec-traceability` | SDD: 追溯验证 |
-| `spec-test` | SDD: TDD 强制循环 |
+| `spec-driven-test` | SDD: 契约测试 + TDD |
 | `sdd-release-guard` | SDD: 发布守卫 |
 
 ---
