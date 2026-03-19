@@ -61,13 +61,13 @@ See [cmd/vic/README.md](./cmd/vic/README.md) for full documentation.
 ```
 定图纸 (Requirements)     打地基 (Architecture)    立规矩 (Implementation)
         │                          │                         │
-   vibe-think              vibe-architect            vic CLI + SDD Skills
+   vibe-think              vibe-architect            sdd-orchestrator
         │                          │                         │
         ▼                          ▼                         ▼
 SPEC-REQUIREMENTS.md  ──▶  SPEC-ARCHITECTURE.md  ──▶  Implementation
         │                          │                         │
         ▼                          ▼                         ▼
-   Gate 0                    Gate 1                  Gate 4 + 5
+   Gate 0                    Gate 1                  Gate 2 + 3
 (Requirements)          (Architecture)           (Code + Tests)
                                                         │
                                                         ▼
@@ -84,24 +84,44 @@ project/
 │       ├── README.md            # English docs
 │       └── *.py                 # Scripts
 │
-├── skills/                         # Skills definitions (merged)
-│   ├── vibe-think/               # Requirements clarification
-│   ├── vibe-architect/           # Architecture design
-│   ├── vibe-debug/               # Debugging
-│   ├── spec-architect/           # SDD: 需求凝固
-│   ├── spec-to-codebase/         # SDD: 代码生成
-│   ├── spec-contract-diff/       # SDD: 代码对齐检查
-│   ├── spec-traceability/        # SDD: 追溯验证
-│   └── sdd-release-guard/       # SDD: 发布守卫
+├── skills/                         # 18 skills total
+│   │
+│   ├── Self-Awareness (4):        # AI self-awareness mechanisms
+│   │   ├── knowledge-boundary/ # Knows/infers/assumes/unknown
+│   │   ├── pre-decision-check/ # Gate check before decisions
+│   │   ├── signal-register/    # Evidence-based progress
+│   │   └── exploration-journal/ # Exploration memory
+│   │
+│   ├── Vibe Exploration (7):     # Flexible exploration
+│   │   ├── vibe-think/         # Requirements clarification
+│   │   ├── vibe-architect/     # Tech selection + architecture
+│   │   ├── vibe-redesign/      # Product redesign
+│   │   ├── vibe-design/        # Design system
+│   │   ├── vibe-debug/         # Systematic debugging
+│   │   ├── vibe-qa/           # Quality assurance
+│   │   └── adaptive-planning/  # Adaptive replanning
+│   │
+│   └── SDD Core (7):              # Strict spec-driven delivery
+│       ├── sdd-orchestrator/    # State machine + gate enforcement
+│       ├── spec-architect/      # Freeze requirements into contracts
+│       ├── spec-to-codebase/    # Generate implementation
+│       ├── spec-contract-diff/  # Detect spec drift
+│       ├── spec-driven-test/    # Contract + TDD tests
+│       ├── spec-traceability/   # Story-to-code traceability
+│       └── sdd-release-guard/  # Final release gates
 │
 ├── docs/                      # Design docs
-│   ├── VIC-CLI-GUIDE.md        # CLI操作指南
+│   ├── VIC-CLI-GUIDE.md      # CLI操作指南
 │   └── *.md
 │
 └── .vic-sdd/                  # Project memory & specs
     ├── SPEC-REQUIREMENTS.md    # Requirements spec
     ├── SPEC-ARCHITECTURE.md    # Architecture spec
-    ├── PROJECT.md             # Project status
+    ├── PROJECT.md              # Project status
+    ├── knowledge-boundary.yaml # AI 认知地图
+    ├── decision-guardrails.yaml # Decision constraints
+    ├── signal-register.yaml    # Evidence-based progress
+    ├── exploration-journal.yaml # Exploration memory
     ├── status/
     │   ├── events.yaml         # Event history
     │   └── state.yaml         # Current state
@@ -128,6 +148,13 @@ project/
 - Small iteration cycles
 - Gate checks before progression
 - Merge to PRD/ARCH/PROJECT
+
+### 自我认知 (Self-Awareness)
+VIBE-SDD gives AI "self-awareness" through 4 mechanisms:
+- **Knowledge Boundary** — Knows what it knows, infers, assumes, or doesn't know
+- **Pre-Decision Check** — Gates before major decisions (scope, quality, signals)
+- **Signal Register** — Evidence-based progress instead of "60% done"
+- **Exploration Journal** — Remembers exploration process to avoid repeating failures
 
 ## AI Quick Start
 
@@ -161,14 +188,24 @@ When AI starts on this project, read in order:
 
 | Skill | Purpose |
 |-------|---------|
-| `vibe-think` | Requirements clarification |
-| `vibe-architect` | Architecture design |
-| `vibe-debug` | Systematic debugging |
-| `spec-architect` | SDD: 需求凝固 |
-| `spec-to-codebase` | SDD: 代码生成 |
-| `spec-contract-diff` | SDD: 代码对齐检查 |
-| `spec-traceability` | SDD: 追溯验证 |
-| `sdd-release-guard` | SDD: 发布守卫 |
+| `vibe-think` | Requirements clarification, user story discovery |
+| `vibe-architect` | Tech selection, architecture design |
+| `vibe-redesign` | Product redesign, scope re-evaluation |
+| `vibe-design` | Design system, UI/UX specifications |
+| `vibe-debug` | Systematic debugging with root cause analysis |
+| `vibe-qa` | Quality assurance, verification against specs |
+| `adaptive-planning` | Adaptive replanning when scope changes |
+| `sdd-orchestrator` | Entry point for SDD phase, state machine |
+| `spec-architect` | Freeze requirements into contracts |
+| `spec-to-codebase` | Generate implementation from contracts |
+| `spec-contract-diff` | Detect drift between spec and code |
+| `spec-driven-test` | Build and enforce test gates |
+| `spec-traceability` | Story-to-contract-to-code-to-test mapping |
+| `sdd-release-guard` | Final SDD release gates |
+| `knowledge-boundary` | Self-awareness: knows/infers/assumes/unknown |
+| `pre-decision-check` | Self-awareness: gate check before decisions |
+| `signal-register` | Self-awareness: evidence-based progress tracking |
+| `exploration-journal` | Self-awareness: exploration memory |
 
 > 注：CLI命令详细用法见 [VIC-CLI-GUIDE.md](./docs/VIC-CLI-GUIDE.md)
 

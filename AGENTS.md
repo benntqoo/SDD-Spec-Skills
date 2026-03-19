@@ -132,19 +132,20 @@ Agent-Architect uses vibe-architect
 SPEC-ARCHITECTURE.md
     ↓
 vic spec gate 1 (Gate: Architecture Completeness)
+    ↓
+Bridge → Agent-Develop enters sdd-orchestrator
 ```
 
 ### Phase 3: 立规矩 (Implementation)
 
 ```
-Agent-Develop activates self-awareness skills
+sdd-orchestrator (activates self-awareness at entry)
     ↓
-    ├── knowledge-boundary    (查询认知地图)
-    ├── pre-decision-check   (决策前检查)
-    ├── signal-register      (记录信号)
-    └── exploration-journal  (记录探索)
+    ├── knowledge-boundary    (query before routing)
+    ├── pre-decision-check   (gate check before transition)
+    └── signal-register      (record each state)
     ↓
-Implementation + Tests
+spec-architect → spec-to-codebase → spec-contract-diff → spec-driven-test
     ↓
 vic gate pass --gate 4 (Code Compiles)
 vic gate pass --gate 5 (Code Aligns SPEC)
@@ -184,7 +185,7 @@ vic spec merge → PRD.md / ARCH.md / PROJECT.md
 ┌─────────────────────────────────────────┐
 │  3. 执行任务                             │
 │     → 产生信号 (signal-register)          │
-│     → 记录探索 (exploration-journal)      │
+│     → 记录探索 (exploration-journal)     │
 └───────────────┬─────────────────────────┘
                 ↓
          周期性信心度检查
@@ -192,6 +193,142 @@ vic spec merge → PRD.md / ARCH.md / PROJECT.md
          ├── 0.4 <= confidence < 0.7 → 关注
          └── confidence < 0.4 → 暂停
 ```
+
+---
+
+## Self-Awareness Activation Protocol
+
+**This is NOT optional.** Every task execution path MUST follow this protocol.
+
+### The Four-Phase Loop
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                                                                          │
+│  PHASE 1: BEGIN (Every task starts here)                                │
+│  ┌────────────────────────────────────────────────────────────────────┐  │
+│  │ skill:knowledge-boundary                                           │  │
+│  │                                                                    │  │
+│  │ INPUT : current task description                                   │  │
+│  │ OUTPUT: categorized list (known/inferred/assumed/unknown)         │  │
+│  │ FILE  : .vic-sdd/knowledge-boundary.yaml (read/write)             │  │
+│  │                                                                    │  │
+│  │ If unknown blocks this task → STOP, record blocker, ask human    │  │
+│  └────────────────────────────────────────────────────────────────────┘  │
+│                               ↓                                          │
+│  ┌────────────────────────────────────────────────────────────────────┐  │
+│  │ skill:pre-decision-check                                           │  │
+│  │                                                                    │  │
+│  │ INPUT : task decision points + knowledge-boundary output          │  │
+│  │ OUTPUT: PASS / WARN / STOP / BLOCK result                        │  │
+│  │ FILES : .vic-sdd/decision-guardrails.yaml (read)                   │  │
+│  │         .vic-sdd/signal-register.yaml (read)                      │  │
+│  │                                                                    │  │
+│  │ If STOP or BLOCK → record signals, do not proceed                 │  │
+│  └────────────────────────────────────────────────────────────────────┘  │
+│                               ↓                                          │
+│  PHASE 2: EXECUTE (delegated to domain skills)                         │
+│  ┌────────────────────────────────────────────────────────────────────┐  │
+│  │ skill:signal-register  ← invoked after EVERY meaningful action   │  │
+│  │ skill:exploration-journal ← invoked after exploration/decision  │  │
+│  │                                                                    │  │
+│  │ positive/warnings/blockers → update signal-register.yaml          │  │
+│  │ explored/tried/decided → update exploration-journal.yaml          │  │
+│  │ RECALCULATE confidence after each signal update                   │  │
+│  └────────────────────────────────────────────────────────────────────┘  │
+│                               ↓                                          │
+│  PHASE 3: CHECKPOINT (after each subtask or milestone)                 │
+│  ┌────────────────────────────────────────────────────────────────────┐  │
+│  │ skill:pre-decision-check (re-entry, lightweight)                   │  │
+│  │                                                                    │  │
+│  │ If confidence < 0.4 → pause, resolve warnings/blockers            │  │
+│  │ If blockers >= 2 → STOP, ask human                               │  │
+│  │ If all clear → continue to next subtask                           │  │
+│  └────────────────────────────────────────────────────────────────────┘  │
+│                               ↓                                          │
+│  PHASE 4: WRAP-UP (task complete)                                       │
+│  ┌────────────────────────────────────────────────────────────────────┐  │
+│  │ skill:knowledge-boundary (final update)                           │  │
+│  │ skill:signal-register (final confidence + summary)               │  │
+│  │                                                                    │  │
+│  │ Move inferred → known (if verified)                              │  │
+│  │ Move assumed → inferred or known (if validated or confirmed)     │  │
+│  │ Emit final confidence score                                       │  │
+│  └────────────────────────────────────────────────────────────────────┘  │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### Calling Order (Enforced)
+
+| # | Skill | When | Read | Write |
+|---|-------|------|------|-------|
+| 1 | `knowledge-boundary` | Task BEGIN | `knowledge-boundary.yaml` | `knowledge-boundary.yaml` |
+| 2 | `pre-decision-check` | Task BEGIN + CHECKPOINT | `decision-guardrails.yaml` + `signal-register.yaml` | `decision-guardrails.yaml` |
+| 3 | `signal-register` | After every meaningful action | `signal-register.yaml` | `signal-register.yaml` |
+| 4 | `exploration-journal` | After every explore/tried/decided/learned | `exploration-journal.yaml` | `exploration-journal.yaml` |
+
+### Data Flow Between Skills
+
+```
+knowledge-boundary.yaml
+       │
+       ├──→ pre-decision-check (for scope/signal queries)
+       │         │
+       │         └──→ signal-register.yaml (blockers → signal blockers)
+       │                   │
+       │                   └──→ pre-decision-check (confidence check)
+       │
+       └──→ exploration-journal.yaml (known items vs journal findings)
+                 │
+                 └──→ knowledge-boundary.yaml (journal findings → new known)
+```
+
+### Integration with SDD Skills
+
+SDD skills MUST activate self-awareness at these points:
+
+| SDD Skill | Activation Point | Skills to Call |
+|-----------|-----------------|----------------|
+| `sdd-orchestrator` | Entry + each state transition | knowledge-boundary, pre-decision-check, signal-register |
+| `spec-architect` | Entry | knowledge-boundary, pre-decision-check |
+| `spec-to-codebase` | Entry + each file generated | signal-register |
+| `spec-contract-diff` | Entry + each diff found | signal-register, exploration-journal |
+| `spec-driven-test` | Entry + each test created | signal-register |
+| `sdd-release-guard` | Final gate | pre-decision-check (final), signal-register (final summary) |
+
+### Integration with Vibe Skills
+
+Vibe skills MUST activate self-awareness at these points:
+
+| Vibe Skill | Activation Point | Skills to Call |
+|------------|-----------------|----------------|
+| `vibe-think` | Entry | knowledge-boundary, exploration-journal |
+| `vibe-architect` | Entry + each tech decision | knowledge-boundary, pre-decision-check, signal-register |
+| `vibe-design` | Entry | knowledge-boundary, pre-decision-check |
+| `vibe-debug` | Entry + each attempted fix | knowledge-boundary, exploration-journal, signal-register |
+| `vibe-qa` | Entry | signal-register |
+
+### Confidence Check Trigger Points
+
+Calculate confidence AFTER adding signals. Check at these milestones:
+
+1. **After Phase 1 (BEGIN)** — ensure task is viable
+2. **After every 3-5 signals** — prevent drift
+3. **Before any state promotion** (SPEC→SDD, SDD gate pass)
+4. **After completing a skill** — before handing off
+5. **Before asking human** — document current state first
+
+### What NOT to Do
+
+| Forbidden | Instead |
+|-----------|---------|
+| Skip knowledge-boundary when unfamiliar with domain | Stop, query, categorize |
+| Proceed when confidence < 0.4 | Pause, resolve blockers |
+| Continue when blockers >= 2 | STOP, ask human |
+| Record vague signals like "progress" | Record specific evidence |
+| Skip pre-decision-check before major decisions | Always check |
+| Leave assumed items unverified indefinitely | Either verify or mark as warning |
 
 ---
 
@@ -302,36 +439,38 @@ vic validate
 
 ## Skills Reference
 
-### Self-Awareness Skills
+### Self-Awareness Skills (Always Active)
 
 | Skill | Purpose | When to Activate |
 |-------|---------|------------------|
-| `knowledge-boundary` | AI 自知之明 | 开始任务前、遇到不确定时 |
-| `pre-decision-check` | 决策前刹车 | 重大决策前 |
-| `signal-register` | 证据链进度 | 每个有意义行动后 |
-| `exploration-journal` | 思考过程记忆 | 开始探索、尝试、决策时 |
+| `knowledge-boundary` | AI 自知之明：knows/infers/assumes/unknown | Task BEGIN + wrap-up |
+| `pre-decision-check` | 决策前刹车：scope/quality/signals check | Task BEGIN + CHECKPOINT |
+| `signal-register` | 证据链进度：positive/warnings/blockers → confidence | After every meaningful action |
+| `exploration-journal` | 思考过程记忆：explore/tried/decided/learned | After every exploration/decision |
 
-### Development Skills
+### SDD Skills (Feature Delivery)
+
+| Skill | Purpose | State |
+|-------|---------|-------|
+| `sdd-orchestrator` | SDD entry point, state machine, gate enforcement | Entry of Phase 2 |
+| `spec-architect` | Freezes requirements into contracts | Ideation/Explore |
+| `spec-to-codebase` | Generates implementation from contracts | SpecCheckpoint |
+| `spec-contract-diff` | Detects drift between spec and code | Build |
+| `spec-driven-test` | Builds and enforces test gates from contracts | Build/Verify |
+| `spec-traceability` | Story-to-contract-to-code-to-test mapping | Any state |
+| `sdd-release-guard` | Final SDD release gates | ReleaseReady |
+
+### Vibe Skills (Exploration & QA)
 
 | Skill | Purpose |
 |-------|---------|
-| `vibe-think` | Requirements clarification |
-| `vibe-architect` | Architecture design |
-| `vibe-debug` | Systematic debugging |
-| `vibe-design` | Design system |
-| `vibe-redesign` | Product redesign |
-| `adaptive-planning` | Adaptive replanning |
-
-### SDD Skills
-
-| Skill | Purpose |
-|-------|---------|
-| `spec-architect` | SDD: 需求凝固 |
-| `spec-to-codebase` | SDD: 代码生成 |
-| `spec-contract-diff` | SDD: 代码对齐检查 |
-| `spec-traceability` | SDD: 追溯验证 |
-| `spec-driven-test` | SDD: 契约测试 + TDD |
-| `sdd-release-guard` | SDD: 发布守卫 |
+| `vibe-think` | Requirements clarification, user story discovery |
+| `vibe-architect` | Tech selection, architecture design, SPEC-ARCHITECTURE.md |
+| `vibe-redesign` | Product redesign, scope re-evaluation |
+| `vibe-design` | Design system, UI/UX specifications |
+| `vibe-debug` | Systematic debugging with root cause analysis |
+| `vibe-qa` | Quality assurance, verification against specs |
+| `adaptive-planning` | Adaptive replanning when scope changes |
 
 ---
 

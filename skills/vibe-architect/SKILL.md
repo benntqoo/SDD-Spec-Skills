@@ -157,6 +157,86 @@ vic rr --id ARCH-RISK-001 \
 
 ---
 
+## Phase 1 → Phase 2 Bridge (SPEC → SDD)
+
+When SPEC-ARCHITECTURE.md is complete and Gate 1 passed:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  ✅ SPEC-ARCHITECTURE.md complete                       │
+│  ✅ Gate 1 (Architecture Completeness) passed           │
+│                                                         │
+│  Next step: Enter SDD Phase                             │
+│                                                         │
+│  1. Record completion:                                  │
+│     vic spec gate pass --gate 1                        │
+│                                                         │
+│  2. Transition to SDD workflow:                         │
+│     → Run skill:sdd-orchestrator                       │
+│       (it will call skill:knowledge-boundary +          │
+│        skill:pre-decision-check at entry)              │
+│                                                         │
+│  3. The orchestrator routes to spec-architect:          │
+│     → spec-architect freezes requirements into          │
+│       SPEC-REQUIREMENTS.frozen.md + contracts          │
+│                                                         │
+│  4. Then routes to spec-to-codebase for generation      │
+│                                                         │
+│  ⚠️ Do NOT skip the orchestrator and call               │
+│     downstream SDD skills directly                     │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Self-Awareness Integration
+
+### At Entry
+
+```
+1. skill:knowledge-boundary
+   → Query: "What do I know/infer/assume/unknown about
+     the tech stack, architecture patterns, and this domain?"
+   → If unknown blocks architecture decisions → STOP
+
+2. skill:pre-decision-check
+   → Check scope, quality hard-lines, signals
+   → If STOP/BLOCK → do not proceed, ask human
+```
+
+### At Each Tech Decision Point
+
+```
+Before committing to any tech selection:
+1. skill:pre-decision-check
+   → Scope check: Is this in approved/forbidden?
+   → Quality check: Any hard-line violations?
+
+After making a tech decision:
+1. skill:signal-register
+   → Record: type=tech_decided, content="<decision>"
+
+2. skill:exploration-journal
+   → Record: action=decided, choice="<decision>",
+     alternatives_considered=[...]
+
+3. vic rt (CLI)
+   → Record technical decision for traceability
+```
+
+### At Completion
+
+```
+1. skill:signal-register
+   → Final confidence recalculation
+
+2. skill:knowledge-boundary (wrap-up)
+   → Move inferred → known (if verified during design)
+   → Move assumed → inferred/known (if validated)
+```
+
+---
+
 ## Required Sections
 
 | Section | Content | Importance |
@@ -176,8 +256,10 @@ vic rr --id ARCH-RISK-001 \
 |-------|--------------|
 | `vibe-think` | Requirements input → SPEC-REQUIREMENTS.md |
 | `vic CLI` | Record technical decisions |
-| `vibe-integrity` | Verify code alignment |
-| `vibe-develop` | Use architecture for implementation |
+| `knowledge-boundary` | Self-awareness: query known/inferred/assumed/unknown |
+| `pre-decision-check` | Self-awareness: check before tech decisions |
+| `signal-register` | Self-awareness: record tech decisions as signals |
+| `sdd-orchestrator` | **Phase 1→Phase 2 bridge**: enter SDD after Gate 1 |
 | `vibe-debug` | Analyze architecture issues |
 
 ---
@@ -200,13 +282,16 @@ vic rr --id ARCH-RISK-001 \
 Before architecture design:
 - [ ] Requirements complete? (Gate 0 passed)
 - [ ] Understanding what needs to build?
+- [ ] Activated knowledge-boundary? (known/inferred/assumed/unknown categorized)
 
 Before technology selection:
 - [ ] Evaluated alternatives?
 - [ ] Considered team familiarity?
 - [ ] Considered long-term maintenance?
+- [ ] pre-decision-check passed for each major choice?
 
 Before SPEC completion:
 - [ ] All sections filled?
 - [ ] Architecture diagram clear?
 - [ ] Gate 1 check passed?
+- [ ] Entered SDD workflow via sdd-orchestrator?

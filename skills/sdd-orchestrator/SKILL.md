@@ -84,6 +84,61 @@ Ideation → Explore → SpecCheckpoint → Build → Verify → ReleaseReady �
 | Promoting state without artifacts | Ensure all required_outputs exist before promotion |
 | Silently changing compatibility mode | Document any changes in contract |
 
+## Self-Awareness Integration
+
+At every state transition, the orchestrator MUST run the Self-Awareness Activation Protocol.
+
+### At Entry (Before Any Routing)
+
+```
+1. skill:knowledge-boundary
+   → Query: "What do I know/infer/assume/unknown about this feature domain?"
+   → If unknown blocks state → STOP
+
+2. skill:pre-decision-check
+   → Check scope, quality hard-lines, current signals
+   → If STOP/BLOCK → do not transition, report to human
+
+3. skill:signal-register
+   → Record state transition as a signal
+   → Update current_task in signal-register.yaml
+```
+
+### At Each Skill Handoff
+
+```
+After routing to downstream skill:
+1. skill:signal-register
+   → Record skill invocation as a signal
+
+After skill completes:
+1. skill:pre-decision-check (lightweight checkpoint)
+   → If confidence < 0.4 → pause, resolve blockers
+   → If blockers >= 2 → STOP, ask human
+
+2. skill:signal-register
+   → Record skill output as evidence
+   → Recalculate confidence
+```
+
+### At Final Gate (sdd-release-guard)
+
+```
+1. skill:pre-decision-check (final check)
+   → Verify all quality hard-lines passed
+   → Verify confidence >= threshold
+
+2. skill:signal-register (final summary)
+   → Emit final confidence score
+   → List all positive/warnings/blockers
+
+3. skill:knowledge-boundary (wrap-up)
+   → Move inferred → known (if verified)
+   → Move assumed → inferred/known (if validated)
+```
+
+---
+
 ## Machine Contracts
 
 - Schema: `skills/sdd-orchestrator/sdd-machine-schema.json`

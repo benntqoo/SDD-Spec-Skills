@@ -61,7 +61,7 @@ vic validate
 ```
 定图纸 (需求)              打地基 (架构)              立规矩 (实现)
     │                         │                        │
-vibe-think            vibe-architect            vibe-develop
+vibe-think            vibe-architect         sdd-orchestrator
     │                         │                        │
     ▼                         ▼                        ▼
 SPEC-REQUIREMENTS.md ─▶ SPEC-ARCHITECTURE.md ─▶ 实现代码
@@ -84,17 +84,31 @@ project/
 │       ├── README.md           # 英文文档
 │       └── *.py                # 脚本
 │
-├── skills/                         # Skills 定义 (统一)
-│   ├── vibe-think/              # 需求探索
-│   ├── vibe-architect/          # 技术选型 + 架构设计
-│   ├── vibe-debug/              # 系统性调试
-│   ├── spec-architect/          # SDD: 需求凝固
-│   ├── spec-to-codebase/        # SDD: 代码生成
-│   ├── spec-contract-diff/      # SDD: 代码对齐检查
-│   ├── spec-traceability/       # SDD: 追溯验证
-│   ├── spec-driven-test/        # SDD: 测试验证
-│   ├── sdd-release-guard/      # SDD: 发布守卫
-│   └── sdd-orchestrator/       # SDD: 编排器
+├── skills/                         # 共 18 个 skills
+│   │
+│   ├── 自我认知 (4):              # AI 自知之明机制
+│   │   ├── knowledge-boundary/ # 知道/推断/假设/不知
+│   │   ├── pre-decision-check/ # 决策前门禁检查
+│   │   ├── signal-register/    # 证据链进度追踪
+│   │   └── exploration-journal/ # 探索过程记忆
+│   │
+│   ├── Vibe 探索 (7):             # 灵活探索流程
+│   │   ├── vibe-think/         # 需求澄清
+│   │   ├── vibe-architect/      # 技术选型 + 架构设计
+│   │   ├── vibe-redesign/      # 产品重新设计
+│   │   ├── vibe-design/        # 设计系统
+│   │   ├── vibe-debug/         # 系统性调试
+│   │   ├── vibe-qa/            # 质量保证
+│   │   └── adaptive-planning/  # 自适应重规划
+│   │
+│   └── SDD 核心 (7):              # 严格的契约驱动交付
+│       ├── sdd-orchestrator/    # 状态机 + 门禁执行
+│       ├── spec-architect/      # 将需求凝固为契约
+│       ├── spec-to-codebase/    # 从契约生成代码
+│       ├── spec-contract-diff/  # 检测契约漂移
+│       ├── spec-driven-test/    # 契约测试 + TDD
+│       ├── spec-traceability/   # 故事→契约→代码→测试追溯
+│       └── sdd-release-guard/  # 最终发布门禁
 │
 ├── docs/                       # 设计文档
 │   ├── VIC-CLI-GUIDE.md       # CLI操作指南
@@ -104,6 +118,10 @@ project/
     ├── SPEC-REQUIREMENTS.md    # 需求规范
     ├── SPEC-ARCHITECTURE.md    # 架构规范
     ├── PROJECT.md              # 项目状态
+    ├── knowledge-boundary.yaml # AI 认知地图
+    ├── decision-guardrails.yaml # 决策约束
+    ├── signal-register.yaml    # 证据链进度
+    ├── exploration-journal.yaml # 探索日志
     ├── status/
     │   ├── events.yaml          # 事件历史
     │   └── state.yaml          # 当前状态
@@ -130,6 +148,13 @@ project/
 - 小步迭代
 - 门禁检查推进
 - 收敛到 PRD/ARCH/PROJECT
+
+### 自我认知 (Self-Awareness)
+VIBE-SDD 通过 4 个机制赋予 AI"自知之明"：
+- **Knowledge Boundary** — 知道自己知道什么、推断什么、假设什么、不知道什么
+- **Pre-Decision Check** — 重大决策前的门禁检查（范围、质量、信号）
+- **Signal Register** — 证据链代替"60% 完成"来追踪进展
+- **Exploration Journal** — 记录探索过程，避免重复踩坑
 
 ## AI 快速开始
 
@@ -161,11 +186,24 @@ project/
 
 | Skill | 用途 |
 |-------|------|
-| `vibe-think` | 需求澄清 |
-| `vibe-architect` | 架构设计 |
-| `vibe-develop` | 开发流程 |
-| `vibe-integrity` | 记忆与验证 |
-| `vibe-debug` | 系统性调试 |
+| `vibe-think` | 需求澄清、用户故事挖掘 |
+| `vibe-architect` | 技术选型、架构设计 |
+| `vibe-redesign` | 产品重新设计、范围重评估 |
+| `vibe-design` | 设计系统、UI/UX 规范 |
+| `vibe-debug` | 系统性调试，根因分析 |
+| `vibe-qa` | 质量保证，对 SPEC 验证 |
+| `adaptive-planning` | 范围变化时的自适应重规划 |
+| `sdd-orchestrator` | SDD 阶段入口，状态机 |
+| `spec-architect` | 将需求凝固为契约 |
+| `spec-to-codebase` | 从契约生成实现代码 |
+| `spec-contract-diff` | 检测代码与契约的漂移 |
+| `spec-driven-test` | 构建并强制执行测试门禁 |
+| `spec-traceability` | 故事→契约→代码→测试追溯 |
+| `sdd-release-guard` | 最终 SDD 发布门禁 |
+| `knowledge-boundary` | 自我认知：知道/推断/假设/不知 |
+| `pre-decision-check` | 自我认知：决策前门禁检查 |
+| `signal-register` | 自我认知：证据链进度追踪 |
+| `exploration-journal` | 自我认知：探索过程记忆 |
 
 ## 安装
 
