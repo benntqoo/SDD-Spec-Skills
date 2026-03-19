@@ -1,0 +1,56 @@
+# Exploration Journal - AI 的思考笔记
+# ============================================================
+# 记录 AI 的探索过程
+# 
+# 目的：
+# - 避免重复探索同一个问题
+# - 记住之前失败的方法
+# - 保留决策上下文
+# 
+# 查询时机：开始新任务前
+# ============================================================
+
+entries: []
+
+# ============================================================
+# 记录类型
+# ============================================================
+#
+# 1. explore - 开始探索
+#    - action: explore
+#    - topic: 要探索什么
+#    - goal: 想找到什么
+#    - findings: 发现（数组）
+#    - status: exploring / complete / blocked
+#
+# 2. tried - 尝试某个方法
+#    - action: tried
+#    - approach: 尝试的方法
+#    - result: success / failed / blocked
+#    - reason: 为什么成功/失败
+#    - evidence: 什么证据证明这个结果
+#
+# 3. decided - 做出决策
+#    - action: decided
+#    - choice: 最终选择
+#    - alternatives_considered: 考虑过的替代方案
+#    - reason: 为什么选这个
+#    - confidence: 决策信心度
+#
+# 4. learned - 学习到教训
+#    - action: learned
+#    - lesson: 学到的教训
+#    - context: 在什么背景下
+#
+# ============================================================
+# 查询示例
+# ============================================================
+#
+# 在开始新任务前，问：
+# "我之前探索过这个领域吗？"
+# "有什么失败的尝试需要避免？"
+# "之前的决策是什么？"
+#
+# 使用 grep：
+# grep -A 5 "action: tried" .vic-sdd/exploration-journal.yaml
+# grep "topic: email validation" .vic-sdd/exploration-journal.yaml
