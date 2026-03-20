@@ -47,6 +47,8 @@ For more information, visit: https://github.com/vic-sdd/vic
 	rootCmd.AddCommand(NewTddCmd(cfg))
 	rootCmd.AddCommand(NewDebugCmd(cfg))
 	rootCmd.AddCommand(NewQaCmd(cfg))
+	rootCmd.AddCommand(NewSkillCmd(cfg))
+	rootCmd.AddCommand(NewDesignCmd(cfg))
 
 	// Add flags
 	rootCmd.PersistentFlags().StringVarP(&cfg.OutputFormat, "output", "o", cfg.OutputFormat, "Output format (json, yaml, plain)")
