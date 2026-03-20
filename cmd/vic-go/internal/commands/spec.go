@@ -99,6 +99,9 @@ func NewSpecCmd(cfg *config.Config) *cobra.Command {
 	cmd.AddCommand(NewSpecStatusCmd(cfg))
 	cmd.AddCommand(NewSpecGateCmd(cfg))
 	cmd.AddCommand(NewSpecMergeCmd(cfg))
+	cmd.AddCommand(NewSpecWatchCmd(cfg))
+	cmd.AddCommand(NewSpecChangesCmd(cfg))
+	cmd.AddCommand(NewSpecDiffCmd(cfg))
 
 	return cmd
 }
@@ -193,44 +196,59 @@ func runSpecStatus(cfg *config.Config) error {
 
 // NewSpecGateCmd runs SPEC gate checks
 func NewSpecGateCmd(cfg *config.Config) *cobra.Command {
-	var gate int
+	var gate float64
 
 	cmd := &cobra.Command{
-		Use:   "gate [0-3]",
+		Use:   "gate [0-3|1.5]",
 		Short: "Run SPEC gate check",
 		Long: `Run SPEC gate validation:
-  Gate 0: Requirements Completeness
-  Gate 1: Architecture Completeness  
-  Gate 2: Code Alignment
-  Gate 3: Test Coverage`,
+  Gate 0:  Requirements Completeness
+  Gate 1:  Architecture Completeness
+  Gate 1.5: Design Completeness (optional, for UI projects)
+  Gate 2:  Code Alignment
+  Gate 3:  Test Coverage`,
 		Example: `  vic spec gate 0
+  vic spec gate 1
+  vic spec gate 1.5
   vic spec gate 2`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
-				fmt.Sscanf(args[0], "%d", &gate)
+				fmt.Sscanf(args[0], "%f", &gate)
 			}
 			return runSpecGate(cfg, gate)
 		},
 	}
 
-	cmd.Flags().IntVarP(&gate, "gate", "g", 0, "Gate number (0-3)")
+	cmd.Flags().Float64VarP(&gate, "gate", "g", 0, "Gate number (0-3, or 1.5)")
 
 	return cmd
 }
 
-func runSpecGate(cfg *config.Config, gate int) error {
-	gateNames := []string{
-		"Requirements Completeness",
-		"Architecture Completeness",
-		"Code Alignment",
-		"Test Coverage",
+func runSpecGate(cfg *config.Config, gate float64) error {
+	gateNames := map[float64]string{
+		0:   "Requirements Completeness",
+		1:   "Architecture Completeness",
+		1.5: "Design Completeness",
+		2:   "Code Alignment",
+		3:   "Test Coverage",
 	}
 
-	if gate < 0 || gate > 3 {
-		return fmt.Errorf("gate must be between 0 and 3")
+	validGates := []float64{0, 1, 1.5, 2, 3}
+	valid := false
+	for _, v := range validGates {
+		if gate == v {
+			valid = true
+			break
+		}
 	}
 
-	fmt.Printf("🚪 Running SPEC Gate %d: %s\n", gate, gateNames[gate])
+	if !valid {
+		return fmt.Errorf("gate must be one of: 0, 1, 1.5, 2, 3")
+	}
+
+	gateName, _ := gateNames[gate]
+
+	fmt.Printf("🚪 Running SPEC Gate %v: %s\n", gate, gateName)
 	fmt.Println("----------------------------------------")
 
 	switch gate {
@@ -238,6 +256,8 @@ func runSpecGate(cfg *config.Config, gate int) error {
 		return RunGate0(cfg)
 	case 1:
 		return RunGate1(cfg)
+	case 1.5:
+		return RunDesignGate(cfg)
 	case 2:
 		return RunGate2(cfg)
 	case 3:

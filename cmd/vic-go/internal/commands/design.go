@@ -277,6 +277,11 @@ func NewDesignCheckCmd(cfg *config.Config) *cobra.Command {
 	}
 }
 
+// RunDesignGate runs Gate 1.5 check (exported for spec.go)
+func RunDesignGate(cfg *config.Config) error {
+	return runDesignCheck()
+}
+
 func runDesignCheck() error {
 	fmt.Println("🎨 Gate 1.5: Design Completeness Check")
 	fmt.Println("========================================")

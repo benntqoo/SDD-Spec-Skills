@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-03-20",
+  "entries": [
+    {
+      "id": "REQ-1773980408",
+      "date": "2026-03-20 12:20",
+      "file": "SPEC-REQUIREMENTS.md",
+      "type": "requirements",
+      "changes": [
+        "Content updated"
+      ],
+      "impact": "high",
+      "reviewed": false
+    },
+    {
+      "id": "ARCH-1773980408",
+      "date": "2026-03-20 12:20",
+      "file": "SPEC-ARCHITECTURE.md",
+      "type": "tech_stack",
+      "changes": [
+        "API endpoints defined",
+        "Security requirements defined"
+      ],
+      "impact": "high",
+      "reviewed": false
+    }
+  ]
+}

@@ -39,7 +39,10 @@ vic rr --id RISK-001 --area auth --desc "JWT not validated"
 | `vic init` | Initialize .vic-sdd/ |
 | `vic spec init` | Initialize SPEC documents |
 | `vic spec status` | Show SPEC status |
-| `vic spec gate [0-3]` | Run Gate checks (validation) |
+| `vic spec gate [0-3\|1.5]` | Run Gate checks (validation) |
+| `vic spec watch` | Monitor SPEC changes and auto-run drift detection |
+| `vic spec diff` | Detect SPEC changes since last check |
+| `vic spec changes` | Show SPEC change history |
 | `vic phase advance` | Advance phase (auto-validates gates) |
 | `vic gate check --blocking` | Pre-commit hook check |
 | `vic rt` | Record technical decision |
@@ -96,7 +99,11 @@ project/
 │   ├── SPEC-ARCHITECTURE.md    # Architecture
 │   ├── PROJECT.md              # Status
 │   ├── agent-prompt.md        # AI workflow prompt
-│   └── context.yaml            # Unified context
+│   ├── context.yaml            # Unified context
+│   └── status/
+│       ├── gate-status.yaml    # Gate check status
+│       ├── spec-hash.json      # SPEC file hashes for change detection
+│       └── change-log.yaml     # SPEC change history
 └── .pre-commit-config.yaml    # Gate enforcement
 ```
 
@@ -157,9 +164,28 @@ When AI starts on this project, read in order:
 # Run before claiming "done"
 vic spec gate 0   # Validates SPEC-REQUIREMENTS.md structure
 vic spec gate 1   # Validates SPEC-ARCHITECTURE.md structure
+vic spec gate 1.5 # Validates DESIGN.md completeness (optional)
 vic spec gate 2   # Checks code vs SPEC alignment
 vic spec gate 3   # Validates test coverage
 ```
+
+### SPEC Change Detection
+
+```bash
+# Start monitoring SPEC files for changes
+vic spec watch     # Detects changes + auto-runs Gate 2 drift check
+
+# Compare current SPEC with last known state
+vic spec diff      # Show what changed
+
+# View change history
+vic spec changes   # Show all recorded changes
+```
+
+Changes are logged to `.vic-sdd/status/change-log.yaml` with:
+- Change type (tech_stack, api, module, security)
+- Impact level (high, medium, low)
+- Review status tracking
 
 ### Pre-commit Hook
 
@@ -178,6 +204,7 @@ vic phase advance --to 1  # Auto-runs all required gates first
 | Start new project | `vic init` |
 | Check requirements | `vic spec gate 0` |
 | Check architecture | `vic spec gate 1` |
+| Monitor SPEC changes | `vic spec watch` |
 | Check code alignment | `vic spec gate 2` |
 | Check test coverage | `vic spec gate 3` |
 | Advance phase | `vic phase advance --to N` |
