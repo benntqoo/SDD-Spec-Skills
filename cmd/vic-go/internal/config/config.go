@@ -15,17 +15,20 @@ type Config struct {
 	ProjectDir string // Project directory (default: current directory)
 
 	// File paths (computed)
-	EventsFile          string
-	StateFile           string
-	TechRecordsFile     string
-	RiskZonesFile       string
-	ProjectFile         string
-	DependencyGraphFile string
-	SpecRequirements    string
-	SpecArchitecture    string
-	ProjectState        string
-	AutoStateFile       string
-	CostTrackingFile    string
+	EventsFile            string
+	StateFile             string
+	TechRecordsFile       string
+	RiskZonesFile         string
+	ProjectFile           string
+	DependencyGraphFile   string
+	SpecRequirements      string
+	SpecArchitecture      string
+	ProjectState          string
+	AutoStateFile         string
+	CostTrackingFile      string
+	EmbeddingDir          string
+	EmbeddingIndexFile    string
+	EmbeddingManifestFile string
 
 	// Output settings
 	OutputFormat string // json, yaml, plain
@@ -77,6 +80,9 @@ func Load() *Config {
 	cfg.ProjectState = filepath.Join(vicPath, "PROJECT.md")
 	cfg.AutoStateFile = filepath.Join(vicPath, "status", "auto.yaml")
 	cfg.CostTrackingFile = filepath.Join(vicPath, "status", "cost.yaml")
+	cfg.EmbeddingDir = filepath.Join(vicPath, "embeddings")
+	cfg.EmbeddingIndexFile = filepath.Join(cfg.EmbeddingDir, "index.sqlite")
+	cfg.EmbeddingManifestFile = filepath.Join(cfg.EmbeddingDir, "manifest.json")
 
 	return cfg
 }

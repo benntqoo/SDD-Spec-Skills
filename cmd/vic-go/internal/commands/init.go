@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/vic-sdd/vic/internal/config"
+	"github.com/vic-sdd/vic/internal/embedding"
 	"github.com/vic-sdd/vic/internal/utils"
 )
 
@@ -39,7 +40,7 @@ func runInit(cfg *config.Config) error {
 	}
 
 	// Create subdirectories
-	subDirs := []string{"status", "tech"}
+	subDirs := []string{"status", "tech", "embeddings"}
 	for _, dir := range subDirs {
 		if err := cfg.EnsureSubDir(dir); err != nil {
 			return fmt.Errorf("failed to create %s/: %w", dir, err)
@@ -77,9 +78,17 @@ func runInit(cfg *config.Config) error {
 	fmt.Printf("✅ Initialized .vic-sdd/ directory\n")
 	fmt.Printf("   Project: %s\n", initName)
 	fmt.Printf("   Tech: %s\n", initTech)
+
+	// Background embedding index build (non-blocking)
+	go func() {
+		sync := embedding.NewSync(cfg.ProjectDir, cfg.EmbeddingDir, cfg.EmbeddingIndexFile)
+		sync.IncrementalSync() // Silently skips if Ollama not available
+	}()
+
 	fmt.Printf("\nNext steps:\n")
 	fmt.Printf("   vic record tech --id DB-001 --title \"Use PostgreSQL\" --decision \"Primary DB\"\n")
 	fmt.Printf("   vic status\n")
+	fmt.Printf("\n💡 Tip: Install Ollama and run 'vic deps sync' to enable 'vic ask' semantic search.\n")
 
 	return nil
 }
