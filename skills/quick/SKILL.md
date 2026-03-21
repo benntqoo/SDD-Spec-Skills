@@ -90,6 +90,18 @@ If the change turns out to be more complex:
 - SPEC impact → use `spec-workflow` skill
 - Complex logic → use `implementation` skill
 
+## Vic Commands
+
+此 Skill 激活时，按以下场景调用 vic 命令：
+
+| 场景 | 命令 | 何时用 |
+|------|------|-------|
+| 确认单文件 | `vic deps list` | 验证改动确实只影响单个模块 |
+| AI Slop 检查 | `vic slop scan --type code` | 改动后扫描是否有 AI Slop 代码模式 |
+| AI Slop 修复 | `vic slop fix --dry-run=false` | 应用自动修复（默认 dry-run，需手动确认） |
+| 诊断检查 | `vic check --category <category>` | 确认改动不影响技术选型 |
+| 状态确认 | `vic status` | 确认项目整体状态正常 |
+
 ## L3: References (Required Reading)
 
 These references are part of the skill, not optional:

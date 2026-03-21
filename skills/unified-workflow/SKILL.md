@@ -109,6 +109,43 @@ Single controller for SDD workflow, Constitution enforcement, and traceability t
    - Add missing mappings
    - Remove orphaned code
 
+## Vic Commands
+
+此 Skill 激活时，按以下场景调用 vic 命令：
+
+### 自主模式
+
+| 场景 | 命令 | 何时用 |
+|------|------|-------|
+| 启动自主模式 | `vic auto start` | 开始 autonomous 开发 |
+| 查看状态 | `vic auto status` | 监控自主模式进度、Token 消耗 |
+| 暂停 | `vic auto pause` | 临时停止自主模式 |
+| 恢复 | `vic auto resume` | 从暂停状态恢复 |
+| 停止 | `vic auto stop` | 结束自主模式会话 |
+
+### 阶段推进
+
+| 场景 | 命令 | 何时用 |
+|------|------|-------|
+| 推进阶段 | `vic phase advance --to <N>` | 从当前阶段推进到下一阶段（自动跑 Gate） |
+| 查看当前阶段 | `vic phase show` | 确认当前 SDD 阶段 |
+
+### 提交前检查（强制）
+
+| 场景 | 命令 | 何时用 |
+|------|------|-------|
+| 阻断性检查 (必须) | `vic gate check --blocking` | **提交前必跑**，所有 blocking 项必须清零 |
+| SPEC Hash | `vic spec hash` | 检测 SPEC 是否变更，变更则不能提交 |
+| Constitution 摘要 | `vic cost status` | 确认成本在预算内 |
+
+### 功能交付 / Traceability
+
+| 场景 | 命令 | 何时用 |
+|------|------|-------|
+| 查看里程碑 | `vic milestone list` | 确认交付在哪个里程碑 |
+| 追溯链路 | `vic history --limit 10` | 验证 User Story → SPEC → Code → Test 链路 |
+| 导出数据 | `vic export --output backup.json` | 交付前备份 vic-sdd 数据 |
+
 ## L3: References (Required Reading)
 
 These references are part of the skill, not optional:

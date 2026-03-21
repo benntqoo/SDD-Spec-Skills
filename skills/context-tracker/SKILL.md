@@ -75,3 +75,17 @@ Update `.vic-sdd/context.yaml` with changes
 | `env_blocking` | Environment issue | Fix environment |
 
 [参考: references/blocker-types.md]
+
+## Vic Commands
+
+此 Skill 激活时，按以下顺序调用 vic 命令：
+
+| 场景 | 命令 | 何时用 |
+|------|------|-------|
+| 会话开始 | `vic status` | 读取项目整体状态 |
+| 会话开始 | `vic spec status` | 确认 SPEC 文档当前状态 |
+| 会话开始 | `vic spec hash` | 检测 SPEC 是否在上次会话后变更 |
+| 会话开始 | `vic gate check --blocking` | 检查所有 Gate 的阻断性问题 |
+| 信心度评估 | `vic cost status` | 查看 Token 消耗，评估会话成本 |
+| 依赖概览 | `vic deps list` | 了解模块结构（影响范围判断） |
+| 上下文更新后 | `vic history --limit 5` | 查看最近事件，确认上下文连续性 |

@@ -1,234 +1,181 @@
 # VIBE-SDD Agent Collaboration Guide
 
-> **简化版** — 详细说明见各 SKILL.md
+> **AI 入口文件** — 此文件定义 AI 进入项目时的起点。
+> **详细执行步骤和 vic 命令调用 → 见各 SKILL.md**
+
+---
 
 ## 系统状态
 
 | 特性 | 状态 |
 |------|------|
-| 多Agent支持 | ✅ Git分支工作流 |
-| 结构化开发 | ✅ .vic-sdd/ SPEC工作流 |
-| AI自我认知 | ✅ context-tracker |
-| Gate检查 | ✅ vic spec gate 0-3 |
+| 结构化开发 | ✅ .vic-sdd/ SPEC 工作流 |
+| AI 自我认知 | ✅ context-tracker (auto_activate) |
+| Gate 检查 | ✅ vic spec gate 0-3 |
+| 规范约束 | ✅ constitution.yaml |
+| 技能系统 | ✅ 5 Skills (Google Cloud Agent Skills 规范) |
 
-## 技能一览 (10个核心)
+---
 
-| 类别 | 技能 | 何时用 |
-|------|------|--------|
-| **合规检查** | `constitution-check` | 计划/审查/提交前必检 |
-| **自我认知** | `context-tracker` | 任务开始/每个动作后/结束 |
-| **需求** | `requirements` | 需求模糊，需要澄清 |
-| **架构** | `architecture` | 需要技术选型 |
-| **设计** | `design-review` | UI/UX设计 |
-| **调试** | `debugging` | Bug修复 |
-| **测试** | `qa` | 测试/TDD |
-| **编排** | `sdd-orchestrator` | SDD状态机入口 |
-| **规范** | `spec-architect` | 需求冻结为合约 |
-| **差异** | `spec-contract-diff` | 检测代码与合约漂移 |
-| **追溯** | `spec-traceability` | 需求→代码→测试链路 |
+## 技能一览 (5 个核心)
+
+| Skill | 何时激活 | 职责 |
+|-------|---------|------|
+| **`context-tracker`** | **每次会话开始 + 每个行动后 + 会话结束** | AI 自我认知、信心度追踪、Blocker 识别 |
+| **`spec-workflow`** | 需求模糊 / 架构设计 / SPEC 创建 | 需求分析 → 架构设计 → SPEC 冻结 |
+| **`implementation`** | 代码实现 / Bug 修复 / 测试 / SPEC 对齐 | TDD 红绿重构、系统调试、Gate 2/3 检查 |
+| **`unified-workflow`** | 功能交付 / 阶段推进 / 提交前 / 追溯检查 | SDD 状态机、Constitution 执行、Traceability |
+| **`quick`** | 简单单文件改动（不涉及 SPEC） | Typo 修复、变量重命名、简单注释 |
 
 ---
 
 ## 决策树：何时用哪个技能？
 
 ```
-你的任务是什么？
-│
-├─ 🤔 需求不清晰 → requirements
-│
-├─ 🏗️ 技术选型/架构 → architecture
-│
-├─ 🎨 UI设计/AI风格检测 → design-review
-│
-├─ 🐛 Bug修复 → debugging
-│
-├─ 🧪 测试/红绿重构 → qa
-│
-├─ 📋 跨模块/多文件改动 → sdd-orchestrator (进入SDD流程)
-│   │
-│   ├─ 需求模糊 → spec-architect
-│   ├─ 实现完成 → spec-contract-diff
-│   └─ 测试完成 → spec-traceability
-│
-└─ 🚀 简单单文件改动 → 直接做！
+AI 进入项目 → 确认上下文 → 执行工作 → 收尾
+
+Step 1: 确认上下文 (context-tracker, auto_activate)
+  → vic status
+  → vic spec status
+  → vic spec hash
+  → vic gate check --blocking
+  → 查看 .vic-sdd/ 状态文件
+  (详细 → skills/context-tracker/SKILL.md)
+
+Step 2: 判断任务类型
+  │
+  ├─ 🤔 需求模糊 / 架构未设计 / 需要 SPEC
+  │   └─→ spec-workflow
+  │       (详细 → skills/spec-workflow/SKILL.md)
+  │
+  ├─ 💻 代码实现 / Bug 修复 / 写测试 / 检查对齐
+  │   └─→ implementation
+  │       (详细 → skills/implementation/SKILL.md)
+  │
+  ├─ 🚀 功能交付 / 阶段推进 / 提交前 / 追溯
+  │   └─→ unified-workflow
+  │       (详细 → skills/unified-workflow/SKILL.md)
+  │
+  └─ 🔧 简单改动（单文件、无 SPEC 影响）
+      └─→ quick
+          (详细 → skills/quick/SKILL.md)
 ```
 
 ---
 
-## 开发流程
+## 规划前置命令（项目启动 / 规划需求前必看）
 
-### SDD vs TDD 选择
+> **这些是 AI 在开始任何实质性工作前应该先运行的命令。**
+> **详细命令说明和参数 → 各 SKILL.md**
 
+### 会话开始（每次对话第一件事）
+
+```bash
+vic status                              # 项目整体状态
+vic spec status                         # SPEC 文档状态
+vic spec hash                           # 检查 SPEC 是否变更
+vic gate check --blocking               # 所有 Gate 状态（阻断性问题）
 ```
-你的任务涉及：
-├─ 跨模块接口/API/合约？ → SDD流程 (sdd-orchestrator)
-│
-└─ 单模块内部逻辑？ → TDD流程 (qa)
+
+### 规划阶段（开始设计或澄清需求前）
+
+```bash
+vic spec list                           # 列出所有 SPEC 文档
+vic spec show                           # 显示 SPEC 概要
+vic milestone list                       # 项目里程碑
+vic task list                           # 剩余任务（如果有）
 ```
 
-### SDD 状态机
+### 状态查询（随时可用）
+
+```bash
+vic history --limit 10                  # 最近事件
+vic search <关键词>                     # 搜索技术决策和风险
+vic deps list                           # 模块依赖概览
+vic cost status                         # Token/费用追踪
+```
+
+---
+
+## SDD 状态机
 
 ```
 Ideation → Explore → SpecCheckpoint → Build → Verify → ReleaseReady → Released
     │         │            │             │        │          │            │
     ▼         ▼            ▼             ▼        ▼          ▼            ▼
-spec-   spec-         spec-       spec-    spec-      sdd-        
-architect architect   to-codebase contract- driven-   release-
-                     (SDD内部)     diff      test      guard
-```
-
-### SDD 技能路由
-
-| 当前状态 | 调用技能 | 目的 |
-|---------|---------|------|
-| Ideation/Explore | `spec-architect` | 创建规范和合约 |
-| SpecCheckpoint | `spec-to-codebase` | 生成实现 |
-| Build | `spec-contract-diff` | 检测漂移 |
-| Build/Verify | `spec-driven-test` | 运行验证测试 |
-| Verify | `sdd-release-guard` | 最终发布门控 |
-
----
-
-## 快速命令
-
-```bash
-# 初始化
-vic init
-vic spec init
-
-# Gate 检查
-vic spec gate 0    # 需求完整性
-vic spec gate 1    # 架构完整性
-vic spec gate 2    # 代码对齐
-vic spec gate 3    # 测试覆盖
-
-# 记录决策
-vic rt --id DB-001 --title "选择PostgreSQL" --decision "主数据库"
-vic rr --id RISK-001 --area auth --desc "JWT未验证"
+spec-workflow                   implementation              unified-workflow
+                               (Gate 2: 代码对齐)            (Gate 3: 测试覆盖)
+                               (Gate 3: 测试覆盖)            (最终交付检查)
 ```
 
 ---
 
-## 质量红线
+## 质量红线（不可违反）
 
-详见 `skills/context-tracker/SKILL.md`
+详见 `skills/context-tracker/SKILL.md` 和 `.vic-sdd/constitution.yaml`
 
-| 红线 | 说明 |
-|------|------|
-| `no_todo_in_code` | 代码里不能有 TODO/FIXME |
-| `no_console_in_prod` | 生产代码不能有 console.log |
-| `no_hardcoded_secrets` | 不能有硬编码密钥 |
-| `tests_required` | 新功能必须有测试 |
-| `spec_aligned` | 必须与 SPEC 对齐 |
+| 规则 ID | 说明 | 触发 |
+|---------|------|------|
+| `SPEC-FIRST` | 改功能必须先改 SPEC | implementation |
+| `SPEC-ALIGNED` | 代码必须对齐 SPEC | Gate 2 |
+| `NO-TODO-IN-CODE` | 代码禁止 TODO/FIXME | Gate 0 |
+| `NO-CONSOLE-IN-PROD` | 生产代码禁止 console.log | 提交前 |
+| `GATE-BEFORE-COMMIT` | 提交前必须过 Gate | unified-workflow |
+| `TESTS-REQUIRED` | 新功能必须有测试 | implementation |
+| `SELF-AWARENESS` | 每步行动后更新 context | context-tracker |
 
 ---
 
-## 信心度
-
-详见 `skills/context-tracker/SKILL.md`
+## 信心度（context-tracker 自动计算）
 
 ```
 confidence = (positive - warnings×0.3 - blockers×0.5) / max_signals
 
 > 0.7    → 🟢 HIGH   → 继续
-0.4-0.7 → 🟡 MODERATE → 继续，关注警告
-< 0.4   → 🔴 LOW   → 暂停，解决阻塞
+0.4-0.7  → 🟡 MODERATE → 继续，关注警告
+< 0.4    → 🔴 LOW   → 暂停，解决阻塞
 blockers >= 2 → 🛑 STOP → 停止，等待人类
 ```
 
 ---
 
-## 目录结构
+## 目录结构（AI 必读文件）
 
 ```
 .vic-sdd/
-├── SPEC-REQUIREMENTS.md    # 需求规范
-├── SPEC-ARCHITECTURE.md    # 架构规范
-├── PROJECT.md              # 项目状态
-├── agent-prompt.md        # AI工作流提示（含强制确认清单）
-├── agent-card.yaml        # A2A Agent Card (多Agent协作)
-├── context.yaml           # 统一上下文 (合并4个YAML)
-├── constitution.yaml       # 不可违反规则清单（Constitution）
-│
-├── status/
-│   ├── events.yaml         # 事件历史
-│   ├── state.yaml          # 当前状态
-│   └── spec-hash.json      # SPEC文件Hash追踪
-├── tech/
-│   └── tech-records.yaml  # 技术决策
-├── risk-zones.yaml         # 风险区域
-└── dependency-graph.yaml  # 模块依赖
+├── SPEC-REQUIREMENTS.md    # 需求规范（先读）
+├── SPEC-ARCHITECTURE.md    # 架构规范（先读）
+├── PROJECT.md               # 项目状态追踪
+├── constitution.yaml        # 不可违反规则（先读）
+├── context.yaml            # AI 自我认知状态（context-tracker 维护）
+├── agent-prompt.md         # AI 工作流提示（含强制检查清单）
+└── status/
+    └── spec-hash.json      # SPEC 变更检测
 
-skills/                    # 11个核心技能 (Google Cloud Agent Skills 规范)
-├── registry.yaml          # Skill Registry (能力发现注册表)
-├── _template/             # Skill 标准模板
-│   └── SKILL.md
-├── constitution-check/    # 合规检查 (critical)
-│   ├── SKILL.md          # L1 + L2 指令
-│   └── references/       # L3 按需资源
-├── context-tracker/       # 自我认知 (critical, auto_activate)
-│   ├── SKILL.md
-│   └── references/
-├── requirements/          # 需求分析 (high)
-│   ├── SKILL.md
-│   └── references/
-├── architecture/          # 架构设计 (high)
-│   ├── SKILL.md
-│   └── references/
-├── design-review/         # 设计审查 (medium)
-│   ├── SKILL.md
-│   └── references/
-├── debugging/             # 调试 (high)
-│   ├── SKILL.md
-│   └── references/
-├── qa/                     # 测试 (high)
-│   ├── SKILL.md
-│   └── references/
-├── sdd-orchestrator/      # SDD编排 (critical)
-│   ├── SKILL.md
-│   └── references/
-├── spec-architect/         # 规范编写 (high)
-│   ├── SKILL.md
-│   └── references/
-├── spec-contract-diff/    # 差异检测 (high)
-│   ├── SKILL.md
-│   └── references/
-└── spec-traceability/     # 追溯追踪 (medium)
-    ├── SKILL.md
-    └── references/
-
-cmd/vic-go/               # vic CLI
+skills/
+├── context-tracker/        # AI 自我认知（auto_activate: true）
+├── spec-workflow/          # 需求/架构/SPEC 创建
+├── implementation/          # 代码/调试/测试/对齐
+├── unified-workflow/        # SDD 编排/Constitution/追溯
+└── quick/                 # 简单单文件改动
 ```
 
 ---
 
 ## 详细文档索引
 
-| 主题 | 文档 |
+| 场景 | 文档 |
 |------|------|
-| **自我认知机制** | `skills/context-tracker/SKILL.md` |
-| **需求分析** | `skills/requirements/SKILL.md` |
-| **架构设计** | `skills/architecture/SKILL.md` |
-| **SDD编排** | `skills/sdd-orchestrator/SKILL.md` |
-| **规范编写** | `skills/spec-architect/SKILL.md` |
-| **CLI命令** | `docs/VIC-CLI-GUIDE.md` |
-| **团队采纳** | `docs/TEAM_ADOPTION_GUIDE.md` |
+| 我是谁 / 我该做什么 | AGENTS.md（此文件）|
+| 每次行动后如何更新状态 | skills/context-tracker/SKILL.md |
+| 需求模糊、架构设计、创建 SPEC | skills/spec-workflow/SKILL.md |
+| 写代码、修复 Bug、测试、对齐 SPEC | skills/implementation/SKILL.md |
+| 功能交付、阶段推进、Constitution、追溯 | skills/unified-workflow/SKILL.md |
+| 简单单文件改动 | skills/quick/SKILL.md |
+| CLI 工具完整命令参考 | docs/VIC-CLI-GUIDE.md |
 
 ---
 
-## 技能合并记录 (19→10)
-
-| 原技能 | 现技能 | 说明 |
-|--------|--------|------|
-| knowledge-boundary, pre-decision-check, signal-register, exploration-journal | context-tracker | 合并4→1 |
-| vibe-think, vibe-redesign | requirements | 合并2→1 |
-| vibe-architect | architecture | 保持 |
-| vibe-design | design-review | 改名 |
-| vibe-debug, adaptive-planning | debugging | 合并2→1 |
-| vibe-qa, spec-driven-test, test-driven-development | qa | 合并3→1 |
-| sdd-orchestrator, spec-to-codebase, sdd-release-guard | sdd-orchestrator | 合并3→1 |
-| spec-architect, spec-contract-diff, spec-traceability | 保持 | 保持 |
-
----
-
-> 详细说明请查阅各 SKILL.md 文件
+> **核心原则**：AGENTS.md 是 AI 的"入口地图"，保持简洁。
+> 详细的工作步骤、vic 命令调用链、具体参数 → 在激活对应 Skill 后加载对应 SKILL.md。
+> 这样避免上下文爆炸，同时保证每个执行步骤都有据可查。

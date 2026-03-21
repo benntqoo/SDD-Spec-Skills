@@ -75,6 +75,20 @@ Handles the complete workflow from vague requirements to frozen SPEC. Combines r
    - Run `vic spec gate 1` (architecture completeness)
    - Fix any issues
 
+## Vic Commands
+
+此 Skill 激活时，按以下顺序调用 vic 命令：
+
+| 场景 | 命令 | 何时用 |
+|------|------|-------|
+| 初始化 SPEC | `vic spec init` | 首次创建 SPEC 文档 |
+| 验证需求完整性 | `vic spec gate 0` | spec-workflow 激活后，运行 Gate 0 验证 |
+| 验证架构完整性 | `vic spec gate 1` | 架构设计完成后，运行 Gate 1 验证 |
+| 查看 SPEC 差异 | `vic spec diff` | 检查当前代码与 SPEC 的差异 |
+| 查看 SPEC 概要 | `vic spec show` | 快速了解 SPEC 整体内容 |
+| 查看里程碑 | `vic milestone list` | 确认需求在哪个里程碑中 |
+| 搜索技术决策 | `vic search <关键词>` | 查找相关技术决策记录 |
+
 ## L3: References (Required Reading)
 
 These references are part of the skill, not optional:
