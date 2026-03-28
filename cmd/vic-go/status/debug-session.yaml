@@ -1,8 +1,0 @@
-active: true
-started_at: 2026-03-19T11:20:07.1915751+08:00
-problem: Login fails in production
-current_phase: survey
-attempts: 0
-root_cause_found: false
-root_cause: ""
-hypothesis: ""
