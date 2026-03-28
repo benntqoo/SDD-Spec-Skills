@@ -371,7 +371,7 @@ func runSlopList() error {
 // ============================================
 
 func saveAISlopReport(cfg *config.Config, report *types.AISlopReport) error {
-	slopFile := cfg.ProjectDir + "/status/slop-report.yaml"
+	slopFile := filepath.Join(cfg.GetVICDir(), "status", "slop-report.yaml")
 
 	// Ensure directory exists
 	if !utils.FileExists(cfg.ProjectDir + "/status") {

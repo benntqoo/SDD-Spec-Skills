@@ -253,7 +253,7 @@ func runProductModes() error {
 // ============================================
 
 func loadProductRecords(cfg *config.Config) (*types.ProductRecordsFile, error) {
-	productFile := cfg.ProjectDir + "/status/product-records.yaml"
+	productFile := filepath.Join(cfg.GetVICDir(), "status", "product-records.yaml")
 
 	if !utils.FileExists(productFile) {
 		return &types.ProductRecordsFile{
@@ -276,13 +276,14 @@ func loadProductRecords(cfg *config.Config) (*types.ProductRecordsFile, error) {
 }
 
 func saveProductRecords(cfg *config.Config, records *types.ProductRecordsFile) error {
-	productFile := cfg.ProjectDir + "/status/product-records.yaml"
+	productFile := filepath.Join(cfg.GetVICDir(), "status", "product-records.yaml")
 
 	// Ensure directory exists
-	if !utils.FileExists(cfg.ProjectDir + "/status") {
-		if err := os.MkdirAll(cfg.ProjectDir+"/status", 0755); err != nil {
+	statusDir := filepath.Join(cfg.GetVICDir(), "status")
+	if !utils.FileExists(statusDir) {
+		if err := os.MkdirAll(statusDir, 0755); err != nil {
 			return fmt.Errorf("failed to create status directory: %w", err)
-		}
+        }
 	}
 
 	data, err := yaml.Marshal(records)

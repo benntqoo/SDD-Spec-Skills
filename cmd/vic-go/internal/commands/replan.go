@@ -278,7 +278,7 @@ func runReplanShow(cfg *config.Config, id string) error {
 // ============================================
 
 func loadReplanLog(cfg *config.Config) (*types.ReplanLogFile, error) {
-	replanFile := cfg.ProjectDir + "/status/replan-log.yaml"
+	replanFile := filepath.Join(cfg.GetVICDir(), "status", "replan-log.yaml")
 
 	if !utils.FileExists(replanFile) {
 		return &types.ReplanLogFile{
@@ -301,7 +301,7 @@ func loadReplanLog(cfg *config.Config) (*types.ReplanLogFile, error) {
 }
 
 func saveReplanLog(cfg *config.Config, replanLog *types.ReplanLogFile) error {
-	replanFile := cfg.ProjectDir + "/status/replan-log.yaml"
+	replanFile := filepath.Join(cfg.GetVICDir(), "status", "replan-log.yaml")
 
 	// Ensure directory exists
 	if !utils.FileExists(cfg.ProjectDir + "/status") {

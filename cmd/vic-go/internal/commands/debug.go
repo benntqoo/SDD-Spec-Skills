@@ -539,7 +539,7 @@ func saveDebugSession(cfg *config.Config, session DebugSession) {
 }
 
 func loadDebugFindings(cfg *config.Config) []DebugFinding {
-	logFile := cfg.ProjectDir + "/status/debug-log.yaml"
+	logFile := filepath.Join(cfg.GetVICDir(), "status", "debug-log.yaml")
 	data, err := os.ReadFile(logFile)
 	if err != nil {
 		return []DebugFinding{}
@@ -553,7 +553,7 @@ func loadDebugFindings(cfg *config.Config) []DebugFinding {
 }
 
 func saveDebugFinding(cfg *config.Config, finding DebugFinding) {
-	logFile := cfg.ProjectDir + "/status/debug-log.yaml"
+	logFile := filepath.Join(cfg.GetVICDir(), "status", "debug-log.yaml")
 
 	var log DebugLog
 	data, _ := os.ReadFile(logFile)
@@ -569,7 +569,7 @@ func saveDebugFinding(cfg *config.Config, finding DebugFinding) {
 }
 
 func loadDebugLog(cfg *config.Config) (DebugLog, error) {
-	logFile := cfg.ProjectDir + "/status/debug-log.yaml"
+	logFile := filepath.Join(cfg.GetVICDir(), "status", "debug-log.yaml")
 	data, err := os.ReadFile(logFile)
 	if err != nil {
 		return DebugLog{}, err

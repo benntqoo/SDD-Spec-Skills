@@ -438,7 +438,7 @@ func runTddHistory(cfg *config.Config) error {
 // ============================================
 
 func loadTDDSession(cfg *config.Config) (TDDSession, error) {
-	sessionFile := cfg.ProjectDir + "/status/tdd-session.yaml"
+	sessionFile := filepath.Join(cfg.GetVICDir(), "status", "tdd-session.yaml")
 	data, err := os.ReadFile(sessionFile)
 	if err != nil {
 		return TDDSession{}, err
@@ -452,7 +452,7 @@ func loadTDDSession(cfg *config.Config) (TDDSession, error) {
 }
 
 func saveTDDSession(cfg *config.Config, session TDDSession) error {
-	sessionFile := cfg.ProjectDir + "/status/tdd-session.yaml"
+	sessionFile := filepath.Join(cfg.GetVICDir(), "status", "tdd-session.yaml")
 	data, err := yaml.Marshal(session)
 	if err != nil {
 		return err
@@ -461,7 +461,7 @@ func saveTDDSession(cfg *config.Config, session TDDSession) error {
 }
 
 func loadTDDHistory(cfg *config.Config) (TDDHistory, error) {
-	historyFile := cfg.ProjectDir + "/status/tdd-history.yaml"
+historyFile := filepath.Join(cfg.GetVICDir(), "status", "tdd-history.yaml")
 	data, err := os.ReadFile(historyFile)
 	if err != nil {
 		return TDDHistory{}, err
@@ -475,7 +475,7 @@ func loadTDDHistory(cfg *config.Config) (TDDHistory, error) {
 }
 
 func saveTDDCheckpoint(cfg *config.Config, checkpoint TDDCheckpoint) {
-	historyFile := cfg.ProjectDir + "/status/tdd-history.yaml"
+historyFile := filepath.Join(cfg.GetVICDir(), "status", "tdd-history.yaml")
 	history, _ := loadTDDHistory(cfg)
 	history.Checkpoints = append(history.Checkpoints, checkpoint)
 	data, _ := yaml.Marshal(history)

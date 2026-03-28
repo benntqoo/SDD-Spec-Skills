@@ -487,18 +487,18 @@ func runQaHistory(cfg *config.Config) error {
 // ============================================
 
 func saveQASession(cfg *config.Config, session QASession) {
-	sessionFile := cfg.ProjectDir + "/status/qa-session.yaml"
+	sessionFile := filepath.Join(cfg.GetVICDir(), "status", "qa-session.yaml")
 	data, _ := yaml.Marshal(session)
 	os.WriteFile(sessionFile, data, 0644)
 }
 
 func saveQAReport(cfg *config.Config, report QAReport) {
-	reportFile := cfg.ProjectDir + "/status/qa-report.yaml"
+reportFile := filepath.Join(cfg.GetVICDir(), "status", "qa-report.yaml")
 	data, _ := yaml.Marshal(report)
 	os.WriteFile(reportFile, data, 0644)
 
 	// Also append to history
-	historyFile := cfg.ProjectDir + "/status/qa-history.yaml"
+historyFile := filepath.Join(cfg.GetVICDir(), "status", "qa-history.yaml")
 	var history []QAReport
 	historyData, _ := os.ReadFile(historyFile)
 	if len(historyData) > 0 {
@@ -510,7 +510,7 @@ func saveQAReport(cfg *config.Config, report QAReport) {
 }
 
 func loadQAReport(cfg *config.Config) (QAReport, error) {
-	reportFile := cfg.ProjectDir + "/status/qa-report.yaml"
+reportFile := filepath.Join(cfg.GetVICDir(), "status", "qa-report.yaml")
 	data, err := os.ReadFile(reportFile)
 	if err != nil {
 		return QAReport{}, err
@@ -524,7 +524,7 @@ func loadQAReport(cfg *config.Config) (QAReport, error) {
 }
 
 func loadQAHistory(cfg *config.Config) ([]QAReport, error) {
-	historyFile := cfg.ProjectDir + "/status/qa-history.yaml"
+historyFile := filepath.Join(cfg.GetVICDir(), "status", "qa-history.yaml")
 	data, err := os.ReadFile(historyFile)
 	if err != nil {
 		return []QAReport{}, err
