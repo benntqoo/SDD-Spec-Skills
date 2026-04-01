@@ -342,82 +342,73 @@ func RunGateCheck(cfg *config.Config, phaseNum int) error {
 	fmt.Println("========================================")
 	fmt.Println()
 
-	// Load phase status
-	phaseFile, err := utils.LoadPhaseStatus(cfg)
-	if err != nil {
-		// Phase status file doesn't exist - this is a new project
-		fmt.Println("⚠️  No phase status found (run 'vic init' first)")
-		fmt.Println("   Allowing commit for new projects...")
+	// Check if SPEC files exist
+	if !fileExists(cfg.SpecRequirements) {
+		fmt.Println("⚠️  SPEC-REQUIREMENTS.md not found")
+		fmt.Println("   Run 'vic spec init' to initialize SPEC files")
 		fmt.Println()
-		return nil
+		return fmt.Errorf("SPEC-REQUIREMENTS.md not found")
 	}
 
-	// Determine which phase we're in
-	if phaseNum < 0 {
-		phaseNum = phaseFile.CurrentPhase
-	}
+	// Determine which gates to check
+	// For pre-commit, check all gates (0-3)
+	gatesToCheck := []int{0, 1, 2, 3}
 
-	// Check gates for current and previous phases
 	allPassed := true
+	gatesFailed := []int{}
 
-	for i := 0; i <= phaseNum; i++ {
-		phase, ok := phaseFile.Phases[i]
-		if !ok {
-			continue
+	for _, gateNum := range gatesToCheck {
+		fmt.Printf("\n🔍 Checking Gate %d...\n", gateNum)
+
+		var passed bool
+		var err error
+
+		switch gateNum {
+		case 0:
+			err = RunGate0(cfg, "plain")
+			passed = (err == nil)
+		case 1:
+			err = RunGate1(cfg, "plain")
+			passed = (err == nil)
+		case 2:
+			err = RunGate2(cfg, "plain")
+			passed = (err == nil)
+		case 3:
+			err = RunGate3(cfg, "plain")
+			passed = (err == nil)
 		}
 
-		// Check at least the first gate for each phase
-		gateKey := fmt.Sprintf("gate_%d", i*2)
-		gate, ok := phase.Gates[gateKey]
-		if !ok {
-			continue
-		}
-
-		icon := "⏳"
-		if gate.Status == "passed" {
-			icon = "✅"
-		} else {
-			icon = "❌"
+		if !passed {
 			allPassed = false
+			gatesFailed = append(gatesFailed, gateNum)
+			fmt.Printf("❌ Gate %d FAILED\n", gateNum)
+		} else {
+			fmt.Printf("✅ Gate %d PASSED\n", gateNum)
 		}
-
-		required := ""
-		if i <= phaseNum {
-			required = " [REQUIRED]"
-		}
-
-		fmt.Printf("[%s] Gate %d: %s%s\n", icon, i*2, gate.Name, required)
-		fmt.Printf("     Status: %s\n", gate.Status)
+		fmt.Println()
 	}
 
-	fmt.Println()
 	fmt.Println("========================================")
 
 	if allPassed {
-		fmt.Println("✅ All required gates passed - commit allowed")
+		fmt.Println("✅ All gates passed - commit allowed")
 		fmt.Println()
 		return nil
 	}
 
-	fmt.Println("❌ Gate check FAILED - some required gates not passed")
+	fmt.Println("❌ Gate check FAILED - some gates not passed")
+	fmt.Println()
+	fmt.Printf("Failed gates: %v\n", gatesFailed)
 	fmt.Println()
 	fmt.Println("To pass gates:")
-	for i := 0; i <= phaseNum; i++ {
-		phase, ok := phaseFile.Phases[i]
-		if !ok {
-			continue
-		}
-		gateKey := fmt.Sprintf("gate_%d", i*2)
-		gate, ok := phase.Gates[gateKey]
-		if ok && gate.Status != "passed" {
-			fmt.Printf("   vic spec gate %d\n", i)
-		}
+	for _, gateNum := range gatesFailed {
+		fmt.Printf("   vic spec gate %d\n", gateNum)
 	}
 	fmt.Println()
 	fmt.Println("⚠️  To bypass (NOT recommended):")
 	fmt.Println("   git commit --no-verify -m 'message'")
 
-	return fmt.Errorf("gate check failed: required gates not passed")
+	return fmt.Errorf("gate check failed: gates %v not passed", gatesFailed)
 }
 
 // NewGateSmartCmd creates the gate smart subcommand

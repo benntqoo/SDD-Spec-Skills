@@ -179,7 +179,7 @@ func RunGate0(cfg *config.Config, format string) error {
 	fmt.Println()
 	fmt.Println("Edit SPEC-REQUIREMENTS.md to fix these issues, then run 'vic spec gate 0' again")
 
-	return nil
+	return fmt.Errorf("gate 0 failed")
 }
 
 // checkFeaturesHaveCriteria verifies features have acceptance criteria

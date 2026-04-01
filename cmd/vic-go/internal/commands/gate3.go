@@ -119,7 +119,7 @@ func RunGate3(cfg *config.Config, format string) error {
 	fmt.Println()
 	fmt.Println("Improve test coverage, then run 'vic spec gate 3' again")
 
-	return nil
+	return fmt.Errorf("gate 3 failed")
 }
 
 // checkTestFilesExist verifies test files exist

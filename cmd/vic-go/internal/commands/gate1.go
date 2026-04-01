@@ -210,7 +210,7 @@ func RunGate1(cfg *config.Config, format string) error {
 	fmt.Println()
 	fmt.Println("Run 'vic spec gate 1' again after fixing issues")
 
-	return nil
+	return fmt.Errorf("gate 1 failed")
 }
 
 // checkTechStackCompleteness verifies tech stack has necessary layers

@@ -165,7 +165,7 @@ func RunGate2(cfg *config.Config, format string) error {
 	}
 	showSpecUpdateRecommendation(failedChecks)
 
-	return nil
+	return fmt.Errorf("gate 2 failed")
 }
 
 // getMostCriticalTODO returns the file:line of the most critical TODO
