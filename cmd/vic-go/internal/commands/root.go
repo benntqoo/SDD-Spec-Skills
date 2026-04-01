@@ -3,6 +3,7 @@ package commands
 import (
 	"github.com/spf13/cobra"
 	"github.com/vic-sdd/vic/internal/config"
+	"github.com/vic-sdd/vic/internal/hooks"
 )
 
 // NewRootCmd creates the root command
@@ -53,6 +54,7 @@ For more information, visit: https://github.com/vic-sdd/vic
 	rootCmd.AddCommand(NewDepsSyncCmd(cfg))
 	rootCmd.AddCommand(NewAskCmd(cfg))
 	rootCmd.AddCommand(NewAssessCmd(cfg))
+	rootCmd.AddCommand(hooks.NewHooksCmd(cfg))
 	// Add flags
 	rootCmd.PersistentFlags().StringVarP(&cfg.OutputFormat, "output", "o", cfg.OutputFormat, "Output format (json, yaml, plain)")
 	rootCmd.PersistentFlags().BoolVarP(&cfg.Verbose, "verbose", "v", cfg.Verbose, "Verbose output")

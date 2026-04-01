@@ -196,24 +196,27 @@ func (s *Sync) IncrementalSync() (added, updated, removed int, err error) {
 	for _, filePath := range changedFiles {
 		content, err := os.ReadFile(filePath)
 		if err != nil {
+			// File may have been deleted or is inaccessible, skip silently
 			continue
 		}
 
 		chunks := s.chunker.ExtractChunks(filePath, string(content))
 		if len(chunks) == 0 {
+			// No extractable chunks in this file, skip silently
 			continue
 		}
 
 		// Delete existing chunks for this file
 		deleted, err := store.DeleteChunksByFile(filePath)
 		if err != nil {
+			// Failed to delete existing chunks, skip this file
 			continue
 		}
 		if deleted > 0 {
 			updated += int(deleted)
 		}
 
-		// Re-embed
+		// Re-embed the chunks
 		texts := make([]string, len(chunks))
 		for i, c := range chunks {
 			text := c.ChunkName
@@ -226,10 +229,12 @@ func (s *Sync) IncrementalSync() (added, updated, removed int, err error) {
 
 		vecs, err := s.embedder.Embed(texts)
 		if err != nil {
+			// Failed to generate embeddings, skip this file
 			continue
 		}
 
 		if err := store.InsertChunks(chunks, vecs); err != nil {
+			// Failed to insert chunks, skip this file
 			continue
 		}
 		if deleted == 0 {
@@ -238,11 +243,16 @@ func (s *Sync) IncrementalSync() (added, updated, removed int, err error) {
 	}
 
 	// Handle removed files (deleted from project)
-	for _, filePath := range changedFiles {
-		if !seenFiles[filePath] {
-			deleted, err := store.DeleteChunksByFile(filePath)
-			if err == nil {
-				removed += int(deleted)
+	// Get all files currently in the index and check if they still exist on disk
+	indexedFiles, err := store.GetAllIndexedFiles()
+	if err == nil {
+		for _, filePath := range indexedFiles {
+			// If the file was not seen during the walk, it has been deleted
+			if !seenFiles[filePath] {
+				deleted, delErr := store.DeleteChunksByFile(filePath)
+				if delErr == nil {
+					removed += int(deleted)
+				}
 			}
 		}
 	}

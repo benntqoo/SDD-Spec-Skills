@@ -70,10 +70,16 @@ type gate1Result struct {
 }
 
 // RunGate1 validates SPEC-ARCHITECTURE.md structure
-func RunGate1(cfg *config.Config) error {
-	fmt.Println("🔍 Gate 1: Architecture Completeness Check")
-	fmt.Println("========================================")
-	fmt.Println()
+func RunGate1(cfg *config.Config, format string) error {
+	// Use GateReport for JSON output
+	report := NewGateReport(1)
+
+	// Plain output header
+	if format != "json" {
+		fmt.Println("🔍 Gate 1: Architecture Completeness Check")
+		fmt.Println("========================================")
+		fmt.Println()
+	}
 
 	// Check file exists
 	if !fileExists(cfg.SpecArchitecture) {
@@ -133,7 +139,27 @@ func RunGate1(cfg *config.Config) error {
 		}
 	}
 
-	// Print results
+	// Collect results into report
+	for _, r := range results {
+		report.AddCheck(r.checkID, r.checkName, r.passed, r.message)
+	}
+
+	// Finalize and output report
+	todoCount := 0
+	for _, r := range results {
+		if r.checkID == "TODO" && !r.passed {
+			todoCount++
+		}
+	}
+	overallSuccess := allPassed && todoCount == 0
+	report.Finalize(overallSuccess)
+
+	if format == "json" {
+		fmt.Println(report.ToJSON())
+		return nil
+	}
+
+	// Plain output
 	for _, r := range results {
 		statusIcon := "❌"
 		if r.passed {
@@ -149,14 +175,6 @@ func RunGate1(cfg *config.Config) error {
 
 	fmt.Println()
 	fmt.Println("========================================")
-
-	// Count TODOs
-	todoCount := 0
-	for _, r := range results {
-		if r.checkID == "TODO" && !r.passed {
-			todoCount++
-		}
-	}
 
 	if allPassed && todoCount == 0 {
 		fmt.Println("✅ Gate 1 PASSED - Architecture document is complete")
@@ -234,11 +252,16 @@ func checkTechStackCompleteness(content string) gate1Result {
 
 // NewGate1Cmd creates the gate 1 command
 func NewGate1Cmd(cfg *config.Config) *cobra.Command {
-	return &cobra.Command{
+	var outputFormat string
+
+	cmd := &cobra.Command{
 		Use:   "gate1",
 		Short: "Validate SPEC-ARCHITECTURE.md structure",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return RunGate1(cfg)
+			return RunGate1(cfg, outputFormat)
 		},
 	}
+	cmd.Flags().StringVarP(&outputFormat, "format", "f", "plain", "Output format (plain, json)")
+
+	return cmd
 }

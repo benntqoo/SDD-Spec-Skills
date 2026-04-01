@@ -56,6 +56,19 @@ vic ask "how does authentication work?"
 
 See [docs/VIC-CLI-GUIDE.md](./docs/VIC-CLI-GUIDE.md) for full documentation.
 
+## Quality Gates
+
+VIBE-SDD includes a comprehensive gate system to ensure quality at each phase:
+
+- **[Gate 0: Requirements](./docs/GATE-GUIDE.md#gate-0-需求完整性)** - Ensure requirements are complete and testable
+- **[Gate 1: Architecture](./docs/GATE-GUIDE.md#gate-1-架构完整性)** - Validate architecture completeness
+- **[Gate 2: Code Alignment](./docs/GATE-GUIDE.md#gate-2-代码对齐)** - Check code-SPEC consistency and TODOs
+- **[Gate 3: Test Coverage](./docs/GATE-GUIDE.md#gate-3-测试覆盖率)** - Verify adequate test coverage
+
+### Quick Reference
+- **[Gate Cheat Sheet](./docs/GATE-CHEAT-SHEET.md)** - Quick reference for gate checks
+- **[Git Hooks Guide](./docs/FIX-LOG.md#2026-04-01---phase-5-git-hooks-集成完成)** - Automated quality checks
+
 ## Development Workflow
 
 ```

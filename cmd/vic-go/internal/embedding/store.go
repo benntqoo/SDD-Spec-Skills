@@ -255,6 +255,32 @@ func (s *Store) ChunkCount() (int, error) {
 	return count, err
 }
 
+// GetAllIndexedFiles returns all unique file paths currently in the index
+func (s *Store) GetAllIndexedFiles() ([]string, error) {
+	rows, err := s.db.Query("SELECT DISTINCT file_path FROM chunks")
+	if err != nil {
+		return nil, fmt.Errorf("failed to query indexed files: %w", err)
+	}
+	defer rows.Close()
+
+	var files []string
+	for rows.Next() {
+		var f string
+		if err := rows.Scan(&f); err != nil {
+			return nil, fmt.Errorf("failed to scan file path: %w", err)
+		}
+		files = append(files, f)
+	}
+	return files, nil
+}
+
+// GetChunkCountByFile returns the number of chunks for a specific file
+func (s *Store) GetChunkCountByFile(filePath string) (int, error) {
+	var count int
+	err := s.db.QueryRow("SELECT COUNT(*) FROM chunks WHERE file_path = ?", filePath).Scan(&count)
+	return count, err
+}
+
 // Clear removes all chunks and vectors
 func (s *Store) Clear() error {
 	tx, err := s.db.Begin()

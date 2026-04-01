@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -158,23 +159,63 @@ func runSpecInit(cfg *config.Config) error {
 
 // NewSpecStatusCmd shows SPEC status
 func NewSpecStatusCmd(cfg *config.Config) *cobra.Command {
-	return &cobra.Command{
+	var format string
+
+	cmd := &cobra.Command{
 		Use:     "status",
 		Short:   "Show SPEC status",
 		Long:    `Show status of SPEC documents.`,
-		Example: `  vic spec status`,
+		Example: `  vic spec status
+  vic spec status --format json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runSpecStatus(cfg)
+			return runSpecStatus(cfg, format)
 		},
 	}
+
+	cmd.Flags().StringVarP(&format, "format", "f", "plain", "Output format (plain, json, yaml)")
+
+	return cmd
 }
 
-func runSpecStatus(cfg *config.Config) error {
-	fmt.Println("📋 SPEC Status")
-	fmt.Println("========================================")
-
+func runSpecStatus(cfg *config.Config, format string) error {
 	reqExists := utils.FileExists(cfg.SpecRequirements)
 	archExists := utils.FileExists(cfg.SpecArchitecture)
+
+	// Build status data
+	statusData := map[string]interface{}{
+		"requirements": map[string]interface{}{
+			"file":   "SPEC-REQUIREMENTS.md",
+			"exists": reqExists,
+		},
+		"architecture": map[string]interface{}{
+			"file":   "SPEC-ARCHITECTURE.md",
+			"exists": archExists,
+		},
+	}
+
+	// JSON/YAML output
+	if format == "json" {
+		fmt.Printf(`{"success":true,"message":"SPEC status","data":%s}`, mustMarshalJSON(statusData))
+		fmt.Println()
+		return nil
+	}
+
+	if format == "yaml" {
+		fmt.Println("success: true")
+		fmt.Println("message: SPEC status")
+		fmt.Println("data:")
+		fmt.Println("  requirements:")
+		fmt.Printf("    file: SPEC-REQUIREMENTS.md\n")
+		fmt.Printf("    exists: %v\n", reqExists)
+		fmt.Println("  architecture:")
+		fmt.Printf("    file: SPEC-ARCHITECTURE.md\n")
+		fmt.Printf("    exists: %v\n", archExists)
+		return nil
+	}
+
+	// Plain output
+	fmt.Println("📋 SPEC Status")
+	fmt.Println("========================================")
 
 	if reqExists {
 		fmt.Printf("   ✅ SPEC-REQUIREMENTS.md: exists\n")
@@ -195,9 +236,18 @@ func runSpecStatus(cfg *config.Config) error {
 	return nil
 }
 
+func mustMarshalJSON(v interface{}) string {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return "{}"
+	}
+	return string(b)
+}
+
 // NewSpecGateCmd runs SPEC gate checks
 func NewSpecGateCmd(cfg *config.Config) *cobra.Command {
 	var gate float64
+	var outputFormat string
 
 	cmd := &cobra.Command{
 		Use:   "gate [0-3|1.5]",
@@ -211,21 +261,23 @@ func NewSpecGateCmd(cfg *config.Config) *cobra.Command {
 		Example: `  vic spec gate 0
   vic spec gate 1
   vic spec gate 1.5
-  vic spec gate 2`,
+  vic spec gate 2
+  vic spec gate 0 --format json`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				fmt.Sscanf(args[0], "%f", &gate)
 			}
-			return runSpecGate(cfg, gate)
+			return runSpecGate(cfg, gate, outputFormat)
 		},
 	}
 
 	cmd.Flags().Float64VarP(&gate, "gate", "g", 0, "Gate number (0-3, or 1.5)")
+	cmd.Flags().StringVarP(&outputFormat, "format", "f", "plain", "Output format (plain, json)")
 
 	return cmd
 }
 
-func runSpecGate(cfg *config.Config, gate float64) error {
+func runSpecGate(cfg *config.Config, gate float64, format string) error {
 	gateNames := map[float64]string{
 		0:   "Requirements Completeness",
 		1:   "Architecture Completeness",
@@ -254,15 +306,15 @@ func runSpecGate(cfg *config.Config, gate float64) error {
 
 	switch gate {
 	case 0:
-		return RunGate0(cfg)
+		return RunGate0(cfg, format)
 	case 1:
-		return RunGate1(cfg)
+		return RunGate1(cfg, format)
 	case 1.5:
 		return RunDesignGate(cfg)
 	case 2:
-		return RunGate2(cfg)
+		return RunGate2(cfg, format)
 	case 3:
-		return RunGate3(cfg)
+		return RunGate3(cfg, format)
 	}
 
 	return nil

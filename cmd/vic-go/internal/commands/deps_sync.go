@@ -12,6 +12,7 @@ import (
 // NewDepsSyncCmd creates the vic deps sync command
 func NewDepsSyncCmd(cfg *config.Config) *cobra.Command {
 	var fullSync bool
+	var format string
 
 	cmd := &cobra.Command{
 		Use:   "sync",
@@ -25,32 +26,41 @@ By default, it performs an incremental sync (only changes since last build).
 Use --full to force a complete rebuild.
 
 Examples:
-  vic deps sync         # Incremental sync (recommended)
-  vic deps sync --full  # Full rebuild`,
+  vic sync              # Incremental sync (recommended)
+  vic sync --full       # Full rebuild
+  vic sync --format json # JSON output`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runDepsSync(cfg, fullSync)
+			return runDepsSync(cfg, fullSync, format)
 		},
 	}
 
 	cmd.Flags().BoolVar(&fullSync, "full", false, "Force full rebuild of the embedding index")
+	cmd.Flags().StringVarP(&format, "format", "f", "plain", "Output format (plain, json)")
 
 	return cmd
 }
 
-func runDepsSync(cfg *config.Config, fullSync bool) error {
+func runDepsSync(cfg *config.Config, fullSync bool, format string) error {
 	// Check if Ollama is available
 	embedder := embedding.NewEmbedder()
 	if !embedder.IsAvailable() {
-		fmt.Println("❌ Ollama is not available")
-		fmt.Println("")
-		fmt.Println("Please install Ollama and pull the embedding model:")
-		fmt.Println("  1. Install Ollama: https://ollama.com")
-		fmt.Println("  2. Pull the model: ollama pull all-minilm-l6-v2")
-		fmt.Println("  3. Ollama will start automatically")
+		if format == "json" {
+			fmt.Printf(`{"success":false,"message":"Ollama is not available","error":"Install Ollama from https://ollama.com and run: ollama pull all-minilm-l6-v2"}`)
+			fmt.Println()
+		} else {
+			fmt.Println("❌ Ollama is not available")
+			fmt.Println("")
+			fmt.Println("Please install Ollama and pull the embedding model:")
+			fmt.Println("  1. Install Ollama: https://ollama.com")
+			fmt.Println("  2. Pull the model: ollama pull all-minilm-l6-v2")
+			fmt.Println("  3. Ollama will start automatically")
+		}
 		return nil
 	}
 
-	fmt.Println("🔄 Syncing embedding index...")
+	if format != "json" {
+		fmt.Println("🔄 Syncing embedding index...")
+	}
 
 	sync := embedding.NewSync(cfg.ProjectDir, cfg.EmbeddingDir, cfg.EmbeddingIndexFile)
 
@@ -59,7 +69,9 @@ func runDepsSync(cfg *config.Config, fullSync bool) error {
 	var added, updated, removed int
 
 	if fullSync {
-		fmt.Println("   Mode: full rebuild")
+		if format != "json" {
+			fmt.Println("   Mode: full rebuild")
+		}
 		err = sync.FullSync()
 		if err == nil {
 			// Get stats after full sync
@@ -71,7 +83,9 @@ func runDepsSync(cfg *config.Config, fullSync bool) error {
 			}
 		}
 	} else {
-		fmt.Println("   Mode: incremental")
+		if format != "json" {
+			fmt.Println("   Mode: incremental")
+		}
 		added, updated, removed, err = sync.IncrementalSync()
 	}
 
@@ -81,6 +95,18 @@ func runDepsSync(cfg *config.Config, fullSync bool) error {
 		return fmt.Errorf("sync failed: %w", err)
 	}
 
+	// JSON output
+	if format == "json" {
+		mode := "incremental"
+		if fullSync {
+			mode = "full"
+		}
+		fmt.Printf(`{"success":true,"message":"Sync completed","data":{"mode":%q,"added":%d,"updated":%d,"removed":%d,"elapsed_ms":%d}}`, mode, added, updated, removed, elapsed.Milliseconds())
+		fmt.Println()
+		return nil
+	}
+
+	// Plain output
 	fmt.Println()
 	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 	fmt.Println("📊 Sync Summary:")

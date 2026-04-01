@@ -73,7 +73,7 @@ func RunSpecWatch(cfg *config.Config) error {
 		// Run drift detection
 		fmt.Println()
 		fmt.Println("🔍 Running tech drift detection...")
-		if err := RunGate2(cfg); err != nil {
+		if err := RunGate2(cfg, "plain"); err != nil {
 			fmt.Printf("⚠️  Gate 2 check failed: %v\n", err)
 		}
 

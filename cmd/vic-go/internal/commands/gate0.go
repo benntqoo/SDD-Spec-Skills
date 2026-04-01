@@ -58,10 +58,16 @@ type gate0Result struct {
 }
 
 // RunGate0 validates SPEC-REQUIREMENTS.md structure
-func RunGate0(cfg *config.Config) error {
-	fmt.Println("🔍 Gate 0: Requirements Completeness Check")
-	fmt.Println("========================================")
-	fmt.Println()
+func RunGate0(cfg *config.Config, format string) error {
+	// Use GateReport for JSON output
+	report := NewGateReport(0)
+
+	// Plain output header
+	if format != "json" {
+		fmt.Println("🔍 Gate 0: Requirements Completeness Check")
+		fmt.Println("========================================")
+		fmt.Println()
+	}
 
 	// Check file exists
 	if !fileExists(cfg.SpecRequirements) {
@@ -112,7 +118,27 @@ func RunGate0(cfg *config.Config) error {
 	featureCheck := checkFeaturesHaveCriteria(contentStr)
 	results = append(results, featureCheck)
 
-	// Print results
+	// Collect results into report
+	for _, r := range results {
+		report.AddCheck(r.checkID, r.checkName, r.passed, r.message)
+	}
+
+	// Finalize and output report
+	todoCount := 0
+	for _, r := range todoResults {
+		if !r.passed {
+			todoCount++
+		}
+	}
+	overallSuccess := allPassed && todoCount == 0
+	report.Finalize(overallSuccess)
+
+	if format == "json" {
+		fmt.Println(report.ToJSON())
+		return nil
+	}
+
+	// Plain output
 	for _, r := range results {
 		statusIcon := "❌"
 		statusText := "FAIL"
@@ -128,14 +154,6 @@ func RunGate0(cfg *config.Config) error {
 
 	fmt.Println()
 	fmt.Println("========================================")
-
-	// Summary
-	todoCount := 0
-	for _, r := range todoResults {
-		if !r.passed {
-			todoCount++
-		}
-	}
 
 	if allPassed && todoCount == 0 {
 		fmt.Println("✅ Gate 0 PASSED - Requirements document is complete")
@@ -222,11 +240,16 @@ func checkFeaturesHaveCriteria(content string) gate0Result {
 
 // NewGate0Cmd creates the gate 0 command
 func NewGate0Cmd(cfg *config.Config) *cobra.Command {
-	return &cobra.Command{
+	var outputFormat string
+
+	cmd := &cobra.Command{
 		Use:   "gate0",
 		Short: "Validate SPEC-REQUIREMENTS.md structure",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return RunGate0(cfg)
+			return RunGate0(cfg, outputFormat)
 		},
 	}
+	cmd.Flags().StringVarP(&outputFormat, "format", "f", "plain", "Output format (plain, json)")
+
+	return cmd
 }

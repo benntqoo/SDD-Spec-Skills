@@ -172,13 +172,13 @@ func runPhaseAdvance(cfg *config.Config, toPhase int, force bool) error {
 			var gateErr error
 			switch gateNum {
 			case 0:
-				gateErr = RunGate0(cfg)
+				gateErr = RunGate0(cfg, "plain")
 			case 1:
-				gateErr = RunGate1(cfg)
+				gateErr = RunGate1(cfg, "plain")
 			case 2:
-				gateErr = RunGate2(cfg)
+				gateErr = RunGate2(cfg, "plain")
 			case 3:
-				gateErr = RunGate3(cfg)
+				gateErr = RunGate3(cfg, "plain")
 			}
 
 			if gateErr != nil {

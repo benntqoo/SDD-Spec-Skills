@@ -19,18 +19,33 @@ type gate3Result struct {
 }
 
 // RunGate3 validates test coverage
-func RunGate3(cfg *config.Config) error {
-	fmt.Println("🔍 Gate 3: Test Coverage Check")
-	fmt.Println("========================================")
-	fmt.Println()
+func RunGate3(cfg *config.Config, format string) error {
+	// Use GateReport for JSON output
+	report := NewGateReport(3)
+
+	// Plain output header
+	if format != "json" {
+		fmt.Println("🔍 Gate 3: Test Coverage Check")
+		fmt.Println("========================================")
+		fmt.Println()
+	}
 
 	// Check if SPEC files exist
 	if !fileExists(cfg.SpecArchitecture) {
-		fmt.Println("❌ SPEC-ARCHITECTURE.md not found - run 'vic spec init' first")
+		if format != "json" {
+			fmt.Println("❌ SPEC-ARCHITECTURE.md not found - run 'vic spec init' first")
+		}
+		report.AddCheck("SPEC_FILE", "SPEC File Exists", false, "SPEC-ARCHITECTURE.md not found")
+		report.Finalize(false)
+		if format == "json" {
+			fmt.Println(report.ToJSON())
+		}
 		return nil
 	}
 
-	fmt.Printf("📄 Checking test coverage in: %s\n\n", cfg.ProjectDir)
+	if format != "json" {
+		fmt.Printf("📄 Checking test coverage in: %s\n\n", cfg.ProjectDir)
+	}
 
 	// Run test checks
 	results := make([]gate3Result, 0)
@@ -51,7 +66,27 @@ func RunGate3(cfg *config.Config) error {
 	criticalPathCheck := checkCriticalPathCoverage(cfg.ProjectDir)
 	results = append(results, criticalPathCheck)
 
-	// Print results
+	// Collect results into report
+	for _, r := range results {
+		report.AddCheck(r.checkID, r.checkName, r.passed, r.message, r.details)
+	}
+
+	// Finalize and output report
+	passedCount := 0
+	for _, r := range results {
+		if r.passed {
+			passedCount++
+		}
+	}
+	overallSuccess := passedCount >= 3 // At least 3 of 4 checks should pass
+	report.Finalize(overallSuccess)
+
+	if format == "json" {
+		fmt.Println(report.ToJSON())
+		return nil
+	}
+
+	// Plain output
 	for _, r := range results {
 		statusIcon := "❌"
 		if r.passed {
@@ -70,14 +105,6 @@ func RunGate3(cfg *config.Config) error {
 
 	fmt.Println()
 	fmt.Println("========================================")
-
-	// Count passed
-	passedCount := 0
-	for _, r := range results {
-		if r.passed {
-			passedCount++
-		}
-	}
 
 	if passedCount >= 3 { // At least 3 of 4 checks should pass
 		fmt.Println("✅ Gate 3 PASSED - Adequate test coverage")
@@ -451,13 +478,18 @@ func checkCriticalPathCoverage(projectDir string) gate3Result {
 
 // NewGate3Cmd creates the gate 3 command
 func NewGate3Cmd(cfg *config.Config) *cobra.Command {
-	return &cobra.Command{
+	var outputFormat string
+
+	cmd := &cobra.Command{
 		Use:   "gate3",
 		Short: "Validate test coverage",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return RunGate3(cfg)
+			return RunGate3(cfg, outputFormat)
 		},
 	}
+	cmd.Flags().StringVarP(&outputFormat, "format", "f", "plain", "Output format (plain, json)")
+
+	return cmd
 }
 
 // min returns the minimum of two integers

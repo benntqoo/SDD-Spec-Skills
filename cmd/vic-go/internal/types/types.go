@@ -167,3 +167,16 @@ type PhaseFile struct {
 	LastUpdated  string        `yaml:"last_updated"`
 	Phases       map[int]Phase `yaml:"phases"`
 }
+
+// ============================================
+// Product Types
+// ============================================
+
+// ProductRecord represents a product redesign record
+type ProductRecord struct {
+	ID        string `yaml:"id"`
+	Original  string `yaml:"original"`
+	Real      string `yaml:"real"`
+	Mode      string `yaml:"mode"`
+	Timestamp string `yaml:"timestamp"`
+}

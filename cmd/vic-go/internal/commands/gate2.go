@@ -20,18 +20,33 @@ type gate2Result struct {
 }
 
 // RunGate2 validates code alignment with SPEC
-func RunGate2(cfg *config.Config) error {
-	fmt.Println("🔍 Gate 2: Code Alignment Check")
-	fmt.Println("========================================")
-	fmt.Println()
+func RunGate2(cfg *config.Config, format string) error {
+	// Use GateReport for JSON output
+	report := NewGateReport(2)
+
+	// Plain output header
+	if format != "json" {
+		fmt.Println("🔍 Gate 2: Code Alignment Check")
+		fmt.Println("========================================")
+		fmt.Println()
+	}
 
 	// Check if SPEC files exist
 	if !fileExists(cfg.SpecArchitecture) {
-		fmt.Println("❌ SPEC-ARCHITECTURE.md not found - run 'vic spec init' first")
+		if format != "json" {
+			fmt.Println("❌ SPEC-ARCHITECTURE.md not found - run 'vic spec init' first")
+		}
+		report.AddCheck("SPEC_FILE", "SPEC File Exists", false, "SPEC-ARCHITECTURE.md not found")
+		report.Finalize(false)
+		if format == "json" {
+			fmt.Println(report.ToJSON())
+		}
 		return nil
 	}
 
-	fmt.Printf("📄 Comparing: %s with code\n\n", cfg.SpecArchitecture)
+	if format != "json" {
+		fmt.Printf("📄 Comparing: %s with code\n\n", cfg.SpecArchitecture)
+	}
 
 	// Read SPEC content
 	specContent, err := os.ReadFile(cfg.SpecArchitecture)
@@ -59,7 +74,59 @@ func RunGate2(cfg *config.Config) error {
 	securityCheck := checkSecurityImplementation(cfg, specStr)
 	results = append(results, securityCheck)
 
-	// Print results
+	// NEW: Code quality scans
+	codeScanner := NewCodeScanner(cfg.ProjectDir)
+
+	// Check for TODOs in code
+	todos := codeScanner.FindTODOs()
+	if len(todos) > 0 {
+		todoResult := gate2Result{
+			checkID:   "CODE_TODOS",
+			checkName: "Code TODO Comments",
+			passed:    false,
+			message:   fmt.Sprintf("Found %d TODO/FIXME/XXX/HACK comments in code", len(todos)),
+			details:   fmt.Sprintf("Most critical: %s", getMostCriticalTODO(todos)),
+		}
+		results = append(results, todoResult)
+	}
+
+	// Check constitution rules
+	violations := codeScanner.ValidateConstitution([]string{
+		"NO-TODO-IN-CODE",
+		"NO-CONSOLE-IN-PROD",
+		"NO-HARD-CODED-SECRETS",
+	})
+	for _, violation := range violations {
+		violationResult := gate2Result{
+			checkID:   "CONSTITUTION",
+			checkName: fmt.Sprintf("Constitution: %s", violation.Rule),
+			passed:    violation.Severity != "error",
+			message:   violation.Message,
+			details:   fmt.Sprintf("%s:%d", violation.File, violation.Line),
+		}
+		results = append(results, violationResult)
+	}
+
+	// Collect results into report
+	for _, r := range results {
+		report.AddCheck(r.checkID, r.checkName, r.passed, r.message, r.details)
+	}
+
+	// Finalize and output report
+	allPassed := true
+	for _, r := range results {
+		if !r.passed {
+			allPassed = false
+		}
+	}
+	report.Finalize(allPassed)
+
+	if format == "json" {
+		fmt.Println(report.ToJSON())
+		return nil
+	}
+
+	// Plain output
 	for _, r := range results {
 		statusIcon := "❌"
 		if r.passed {
@@ -79,22 +146,14 @@ func RunGate2(cfg *config.Config) error {
 	fmt.Println()
 	fmt.Println("========================================")
 
-	// Count passed
-	passedCount := 0
-	for _, r := range results {
-		if r.passed {
-			passedCount++
-		}
-	}
-
-	if passedCount == len(results) {
+	if allPassed {
 		fmt.Println("✅ Gate 2 PASSED - Code aligns with SPEC")
 		fmt.Println()
 		fmt.Println("Next: Run 'vic spec gate 3' to check test coverage")
 		return nil
 	}
 
-	fmt.Printf("❌ Gate 2 FAILED - %d/%d checks failed\n", len(results)-passedCount, len(results))
+	fmt.Printf("❌ Gate 2 FAILED - %d/%d checks failed\n", len(results)-report.PassedChecks, len(results))
 	fmt.Println()
 
 	// Collect failed check names for recommendation
@@ -109,6 +168,19 @@ func RunGate2(cfg *config.Config) error {
 	return nil
 }
 
+// getMostCriticalTODO returns the file:line of the most critical TODO
+func getMostCriticalTODO(todos []TODOComment) string {
+	for _, todo := range todos {
+		if todo.Priority == "high" {
+			return fmt.Sprintf("%s:%d", todo.File, todo.Line)
+		}
+	}
+	if len(todos) > 0 {
+		return fmt.Sprintf("%s:%d", todos[0].File, todos[0].Line)
+	}
+	return ""
+}
+
 // showSpecUpdateRecommendation prints recommended actions when drift is detected
 func showSpecUpdateRecommendation(affectedSections []string) {
 	fmt.Println("════════════════════════════════════════════════════════════")
@@ -119,20 +191,16 @@ func showSpecUpdateRecommendation(affectedSections []string) {
 		fmt.Printf("Drift detected in: %s\n\n", strings.Join(affectedSections, ", "))
 	}
 
-	fmt.Println("To resolve this drift, choose one of the following:\n")
-
+	fmt.Println("To resolve this drift, choose one of the following:")
 	fmt.Println("1️⃣  Update SPEC (Recommended)")
 	fmt.Println("    $ vic spec update --file SPEC-ARCHITECTURE.md --section \"[section]\"")
-	fmt.Println("    Then: vic spec gate 2\n")
-
+	fmt.Println("    Then: vic spec gate 2")
 	fmt.Println("2️⃣  Revert code changes")
 	fmt.Println("    $ git diff [affected files]")
-	fmt.Println("    Then: Revert and re-implement correctly\n")
-
+	fmt.Println("    Then: Revert and re-implement correctly")
 	fmt.Println("3️⃣  Document as accepted drift (requires approval)")
 	fmt.Println("    $ vic rr --id DRIFT-[DATE] --desc \"[description]\"")
-	fmt.Println("    ⚠️  Only for emergency hotfixes\n")
-
+	fmt.Println("    ⚠️  Only for emergency hotfixes")
 	fmt.Println("For more details, see: skills/constitution-check/SKILL.md")
 	fmt.Println("════════════════════════════════════════════════════════════")
 }
@@ -463,11 +531,16 @@ func checkSecurityImplementation(cfg *config.Config, specContent string) gate2Re
 
 // NewGate2Cmd creates the gate 2 command
 func NewGate2Cmd(cfg *config.Config) *cobra.Command {
-	return &cobra.Command{
+	var outputFormat string
+
+	cmd := &cobra.Command{
 		Use:   "gate2",
 		Short: "Validate code alignment with SPEC",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return RunGate2(cfg)
+			return RunGate2(cfg, outputFormat)
 		},
 	}
+	cmd.Flags().StringVarP(&outputFormat, "format", "f", "plain", "Output format (plain, json)")
+
+	return cmd
 }

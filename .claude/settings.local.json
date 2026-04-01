@@ -6,7 +6,11 @@
       "Bash(taskkill:*)",
       "Bash(find:*)",
       "mcp__web-search-prime__web_search_prime",
-      "mcp__web-reader__webReader"
+      "mcp__web-reader__webReader",
+      "Bash(cd D:/Code/aaa/cmd/vic-go && go build -o vic.exe . 2>&1)",
+      "Bash(cd D:/Code/aaa/cmd/vic-go && go build -o vic.exe . 2>&1 && go test ./internal/output/... 2>&1)",
+      "Bash(cd:*)",
+      "Bash(head:*)"
     ]
   }
 }

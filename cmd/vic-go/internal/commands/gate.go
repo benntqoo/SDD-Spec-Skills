@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/vic-sdd/vic/internal/config"
+	"github.com/vic-sdd/vic/internal/hooks"
 	"github.com/vic-sdd/vic/internal/utils"
 )
 
@@ -24,6 +25,7 @@ func NewGateCmd(cfg *config.Config) *cobra.Command {
 	cmd.AddCommand(NewGatePassCmd(cfg))
 	cmd.AddCommand(NewGateCheckCmd(cfg))
 	cmd.AddCommand(NewGateSmartCmd(cfg))
+	cmd.AddCommand(hooks.NewHooksCmd(cfg))
 
 	return cmd
 }
@@ -161,6 +163,7 @@ func runGatePass(cfg *config.Config, gateNum int, notes string) error {
 func NewGateCheckCmd(cfg *config.Config) *cobra.Command {
 	var phaseNum int
 	var blocking bool
+	var format string
 
 	cmd := &cobra.Command{
 		Use:   "check",
@@ -173,23 +176,25 @@ all VIBE-SDD gates are passed before allowing a commit.
 Examples:
   vic gate check                    # Check current phase gates
   vic gate check --phase 1          # Check phase 1 gates
-  vic gate check --blocking          # Exit with error if gates not passed`,
+  vic gate check --blocking         # Exit with error if gates not passed
+  vic gate check --format json      # JSON output`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if blocking {
 				return RunGateCheck(cfg, phaseNum)
 			}
-			return runGateStatusCheck(cfg, phaseNum)
+			return runGateStatusCheck(cfg, phaseNum, format)
 		},
 	}
 
 	cmd.Flags().IntVarP(&phaseNum, "phase", "p", -1, "Phase number (0-3), -1 for current")
 	cmd.Flags().BoolVarP(&blocking, "blocking", "b", false, "Exit with error if gates not passed (for pre-commit)")
+	cmd.Flags().StringVarP(&format, "format", "f", "plain", "Output format (plain, json)")
 
 	return cmd
 }
 
 // runGateStatusCheck shows gate status for a phase
-func runGateStatusCheck(cfg *config.Config, phaseNum int) error {
+func runGateStatusCheck(cfg *config.Config, phaseNum int, format string) error {
 	phaseFile, err := utils.LoadPhaseStatus(cfg)
 	if err != nil {
 		return fmt.Errorf("failed to load phase status: %w", err)
@@ -209,10 +214,8 @@ func runGateStatusCheck(cfg *config.Config, phaseNum int) error {
 		return fmt.Errorf("phase %d not found", phaseNum)
 	}
 
-	fmt.Printf("🔍 Checking Phase %d: %s\n", phaseNum, phase.Name)
-	fmt.Println("========================================")
-
-	// Check each gate
+	// Collect gate status
+	gateResults := []map[string]interface{}{}
 	allPassed := true
 	for g := 0; g < 2; g++ {
 		gateKey := fmt.Sprintf("gate_%d", phaseNum*2+g)
@@ -220,24 +223,51 @@ func runGateStatusCheck(cfg *config.Config, phaseNum int) error {
 		if !ok {
 			continue
 		}
+		if gate.Status != "passed" {
+			allPassed = false
+		}
+		gateResults = append(gateResults, map[string]interface{}{
+			"gate":    phaseNum*2 + g,
+			"name":    gate.Name,
+			"status":  gate.Status,
+			"checked": gate.CheckedAt,
+		})
+	}
 
+	// JSON output
+	if format == "json" {
+		fmt.Printf(`{"success":%v,"message":"Gate check completed","data":{"phase":%d,"phase_name":%q,"all_passed":%v,"gates":[`, allPassed, phaseNum, phase.Name, allPassed)
+		for i, g := range gateResults {
+			if i > 0 {
+				fmt.Printf(",")
+			}
+			fmt.Printf(`{"gate":%d,"name":%q,"status":%q,"checked":%q}`, g["gate"], g["name"], g["status"], g["checked"])
+		}
+		fmt.Printf(`]}}`)
+		fmt.Println()
+		return nil
+	}
+
+	// Plain output
+	fmt.Printf("🔍 Checking Phase %d: %s\n", phaseNum, phase.Name)
+	fmt.Println("========================================")
+
+	// Display each gate from collected results
+	for _, g := range gateResults {
 		icon := "⏳"
-		if gate.Status == "passed" {
+		if g["status"] == "passed" {
 			icon = "✅"
-		} else if gate.Status == "failed" {
+		} else if g["status"] == "failed" {
 			icon = "❌"
-			allPassed = false
-		} else {
-			allPassed = false
 		}
 
-		fmt.Printf("\n%s Gate %d: %s\n", icon, phaseNum*2+g, gate.Name)
-		fmt.Printf("   Status: %s\n", gate.Status)
-		if gate.CheckedAt != "" {
-			fmt.Printf("   Checked: %s\n", gate.CheckedAt)
+		fmt.Printf("\n%s Gate %d: %s\n", icon, g["gate"], g["name"])
+		fmt.Printf("   Status: %s\n", g["status"])
+		if g["checked"] != "" {
+			fmt.Printf("   Checked: %s\n", g["checked"])
 		}
-		if gate.Notes != "" {
-			fmt.Printf("   Notes: %s\n", gate.Notes)
+		if g["notes"] != nil && g["notes"] != "" {
+			fmt.Printf("   Notes: %s\n", g["notes"])
 		}
 	}
 
