@@ -7,6 +7,11 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
+# Build artifacts
+*.exe
+cmd/vic-go/vic
+cmd/vic-go/vic.exe
+
 # SDD Spec artifacts
 .sdd-spec/
 *.py[cod]
