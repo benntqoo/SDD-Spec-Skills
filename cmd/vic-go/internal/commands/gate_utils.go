@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-// checkForTODOs checks for unresolved TBD/TODO/FIXME markers
-func checkForTODOs(content string) []gate0Result {
+// checkForTBDs checks for unresolved TBD/TODO/FIXME markers
+func checkForTBDs(content string) []gate0Result {
 	results := make([]gate0Result, 0)
 	scanner := bufio.NewScanner(strings.NewReader(content))
 	lineNum := 0

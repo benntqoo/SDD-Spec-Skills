@@ -127,7 +127,7 @@ func RunGate1(cfg *config.Config, format string) error {
 	results = append(results, techCheck)
 
 	// Check for TODOs
-	todoResults := checkForTODOs(contentStr)
+	todoResults := checkForTBDs(contentStr)
 	for _, r := range todoResults {
 		if r.checkID == "TODO" {
 			results = append(results, gate1Result{

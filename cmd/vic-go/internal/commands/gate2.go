@@ -169,7 +169,7 @@ func RunGate2(cfg *config.Config, format string) error {
 }
 
 // getMostCriticalTODO returns the file:line of the most critical TODO
-func getMostCriticalTODO(todos []TODOComment) string {
+func getMostCriticalTODO(todos []Comment) string {
 	for _, todo := range todos {
 		if todo.Priority == "high" {
 			return fmt.Sprintf("%s:%d", todo.File, todo.Line)

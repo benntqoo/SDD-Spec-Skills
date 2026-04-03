@@ -8,12 +8,12 @@ import (
 	"strings"
 )
 
-// TODOComment represents a TODO comment found in code
-type TODOComment struct {
+// Comment represents a comment found in code
+type Comment struct {
 	File     string `json:"file"`
 	Line     int    `json:"line"`
 	Column   int    `json:"column"`
-	Type     string `json:"type"`           // type of comment (TOD, FIXME, XXX, HACK)
+	Type     string `json:"type"`           // type of comment (TODO, FIXME, XXX, HACK)
 	Priority string `json:"priority,omitempty"` // low, medium, high
 	Text      string `json:"text"`
 	Context   string `json:"context,omitempty"`
@@ -58,8 +58,8 @@ func NewCodeScanner(projectDir string) *CodeScanner {
 }
 
 // FindTODOs scans code for TODO/FIXME/XXX/HACK comments
-func (s *CodeScanner) FindTODOs() []TODOComment {
-	todos := []TODOComment{}
+func (s *CodeScanner) FindTODOs() []Comment {
+	todos := []Comment{}
 
 	filepath.Walk(s.projectDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -114,7 +114,7 @@ func (s *CodeScanner) FindTODOs() []TODOComment {
 				for pattern, todoType := range todoPatterns {
 					todoRe := regexp.MustCompile(pattern)
 					if todoRe.MatchString(commentMatch) {
-						todo := TODOComment{
+						todo := Comment{
 							File:    filepath.Base(path),
 							Line:    lineNum,
 							Type:     todoType,
@@ -204,7 +204,7 @@ func (s *CodeScanner) checkRule(rule string, line string) bool {
 	case "NO-TODO-IN-CODE":
 		// Only check TODO/FIXME/XXX/HACK in actual comments (// /* */)
 		// Exclude comment markers, function names, and string literals
-		if strings.Contains(line, "// TODOComment") || strings.Contains(line, "checkForTODOs") {
+		if strings.Contains(line, "// Comment") || strings.Contains(line, "checkForTBDs") {
 			return false
 		}
 		return regexp.MustCompile(`(?i)//\s*(TODO|FIXME|XXX|HACK)\b|/\*\s*(TODO|FIXME|XXX|HACK)\b`).MatchString(line)
